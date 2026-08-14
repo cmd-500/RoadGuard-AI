@@ -1,0 +1,73 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: roadguard-backend
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:roadguard}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# Cloudinary
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+  api-key: ${CLOUDINARY_API_KEY:}
+  api-secret: ${CLOUDINARY_API_SECRET:}
+
+# JWT
+jwt:
+  secret: ${JWT_SECRET:your-super-secret-key-change-in-production-min-256-bits}
+  expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
+
+# App constants
+app:
+  trust:
+    default-score: 50
+    threshold: 75
+    bonus: 5
+    penalty: 8
+    trusted-vote-weight: 2
+    default-vote-weight: 1
+  vote:
+    confirm-threshold: 5
+    dispute-threshold: -5
+  geo:
+    nearby-alert-radius: 300
+    route-buffer: 150
+    duplicate-radius: 100
+  image:
+    gps-mismatch-threshold: 500
+    blur-variance-threshold: 80
+    duplicate-hash-max-distance: 8
+    duplicate-lookback-days: 30
+
+logging:
+  level:
+    com.roadguard: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

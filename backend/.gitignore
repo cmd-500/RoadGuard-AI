@@ -1,0 +1,42 @@
+# Build
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Test
+target/surefire-reports/
+target/failsafe-reports/
+*.ec
+
+# Maven
+.mvn/timing.properties
+maven-wrapper.jar
+
+# Docker
+docker-compose.override.yml

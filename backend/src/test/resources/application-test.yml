@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: roadguard-backend-test
+  datasource:
+    url: jdbc:tc:postgresql:16-alpine:///roadguard_test
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
+        format_sql: true
+
+jwt:
+  secret: dGVzdC1zZWNyZXQta2V5LWZvci10ZXN0aW5nLXB1cnBvc2VzLW9ubHk=
+  expiration: 3600000
+  refresh-expiration: 7200000
+
+cloudinary:
+  cloud-name: test
+  api-key: test
+  api-secret: test
+
+app:
+  trust:
+    default-score: 50
+    threshold: 75
+    bonus: 5
+    penalty: 8
+    trusted-vote-weight: 2
+    default-vote-weight: 1
+  vote:
+    confirm-threshold: 5
+    dispute-threshold: -5
+  geo:
+    nearby-alert-radius: 300
+    route-buffer: 150
+    duplicate-radius: 100
+  image:
+    gps-mismatch-threshold: 500
+    blur-variance-threshold: 80
+    duplicate-hash-max-distance: 8
+    duplicate-lookback-days: 30
+
+logging:
+  level:
+    com.roadguard: DEBUG
+    org.springframework.security: DEBUG
