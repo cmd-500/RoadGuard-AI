@@ -6,9 +6,11 @@ import 'shared/providers/auth_provider.dart';
 import 'shared/providers/report_provider.dart';
 import 'shared/providers/vote_provider.dart';
 import 'shared/providers/location_provider.dart';
+import 'shared/providers/alert_provider.dart';
 import 'shared/repositories/auth_repository.dart';
 import 'shared/repositories/report_repository.dart';
 import 'shared/repositories/vote_repository.dart';
+import 'shared/repositories/alert_repository.dart';
 import 'shared/services/api_client.dart';
 import 'features/home/home_screen.dart';
 
@@ -35,6 +37,9 @@ class RoadSafeApp extends StatelessWidget {
         Provider<VoteRepository>(
           create: (_) => VoteRepositoryImpl(apiClient: apiClient),
         ),
+        Provider<AlertRepository>(
+          create: (_) => MockAlertRepositoryImpl(),
+        ),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
             repository: context.read<AuthRepository>(),
@@ -52,6 +57,11 @@ class RoadSafeApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<LocationProvider>(
           create: (_) => LocationProvider()..requestPermission(),
+        ),
+        ChangeNotifierProvider<AlertProvider>(
+          create: (context) => AlertProvider(
+            repository: context.read<AlertRepository>(),
+          ),
         ),
       ],
       child: MaterialApp(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:provider/provider.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
 import '../../shared/models/alert.dart';
+import '../../shared/providers/alert_provider.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -12,97 +13,39 @@ class AlertsScreen extends StatefulWidget {
 }
 
 class _AlertsScreenState extends State<AlertsScreen> {
-  String _selectedFilter = 'All Alerts';
-  final List<String> _filters = ['All Alerts', 'Road', 'Weather', 'Disaster', 'Visibility', 'Emergency'];
-
-  // Mock alerts data
-  final List<SafetyAlert> _alerts = [
-    SafetyAlert(
-      id: '1',
-      title: 'Flood Warning',
-      description: 'Heavy rainfall expected. Low-lying areas may experience flooding. Avoid travel if possible.',
-      location: 'Noida, Uttar Pradesh',
-      distanceKm: 5.2,
-      severity: AlertSeverity.critical,
-      category: AlertCategory.emergency,
-      source: 'IMD',
-      updatedAt: DateTime.now().subtract(const Duration(hours: 2)),
-      imageUrl: '',
-      affectedRoads: ['Noida–Greater Noida Expressway', 'Sector 18 Main Road', 'Dadri Road'],
-      isEmergency: true,
-    ),
-    SafetyAlert(
-      id: '2',
-      title: 'Heavy Rainfall',
-      description: 'Continuous heavy rain expected for next 6 hours. Reduced visibility on highways.',
-      location: 'Delhi NCR',
-      distanceKm: 12.5,
-      severity: AlertSeverity.high,
-      category: AlertCategory.weather,
-      source: 'Weather Dept',
-      updatedAt: DateTime.now().subtract(const Duration(hours: 4)),
-      imageUrl: '',
-      affectedRoads: [],
-      isEmergency: false,
-    ),
-    SafetyAlert(
-      id: '3',
-      title: 'Dense Fog',
-      description: 'Visibility reduced to less than 50 meters on expressways. Drive with caution.',
-      location: 'Delhi–Meerut Expressway',
-      distanceKm: 8.0,
-      severity: AlertSeverity.medium,
-      category: AlertCategory.visibility,
-      source: 'Traffic Police',
-      updatedAt: DateTime.now().subtract(const Duration(hours: 1)),
-      imageUrl: '',
-      affectedRoads: [],
-      isEmergency: false,
-    ),
-    SafetyAlert(
-      id: '4',
-      title: 'Landslide Warning',
-      description: 'Potential landslide risk on hilly routes. Alternative routes advised.',
-      location: 'Mussoorie Road',
-      distanceKm: 45.0,
-      severity: AlertSeverity.high,
-      category: AlertCategory.disaster,
-      source: 'Geological Survey',
-      updatedAt: DateTime.now().subtract(const Duration(hours: 6)),
-      imageUrl: '',
-      affectedRoads: [],
-      isEmergency: false,
-    ),
-    SafetyAlert(
-      id: '5',
-      title: 'Wildfire Alert',
-      description: 'Forest fire reported near highway. Smoke may reduce visibility.',
-      location: 'Rajaji National Park',
-      distanceKm: 30.0,
-      severity: AlertSeverity.critical,
-      category: AlertCategory.emergency,
-      source: 'Forest Dept',
-      updatedAt: DateTime.now().subtract(const Duration(hours: 3)),
-      imageUrl: '',
-      affectedRoads: [],
-      isEmergency: true,
-    ),
+  static const _categories = <AlertCategory>[
+    AlertCategory.all,
+    AlertCategory.road,
+    AlertCategory.weather,
+    AlertCategory.disaster,
+    AlertCategory.visibility,
+    AlertCategory.emergency,
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AlertProvider>().fetchAlerts();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = context.watch<AlertProvider>();
+
     return Scaffold(
       backgroundColor: RoadSafeColors.background,
       appBar: RoadSafeAppBar(
         title: 'Safety Alerts',
         leading: IconButton(
-          icon: Icon(PhosphorIconsRegular.list, size: 24),
+          icon: Icon(RoadSafeIcons.menu, size: 24),
           onPressed: () {},
           padding: const EdgeInsets.only(left: RoadSafeSpacing.screenPadding),
         ),
         actions: [
           IconButton(
-            icon: Icon(PhosphorIconsRegular.bell, size: 24),
+            icon: Icon(RoadSafeIcons.bell, size: 24),
             onPressed: () {},
             padding: const EdgeInsets.only(right: RoadSafeSpacing.screenPadding),
           ),
@@ -110,42 +53,94 @@ class _AlertsScreenState extends State<AlertsScreen> {
       ),
       body: Column(
         children: [
-          _buildFilterChips(),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(RoadSafeSpacing.screenPadding),
-              children: [
-                _buildEmergencyAlerts(),
-                const SizedBox(height: RoadSafeSpacing.xl),
-                _buildAffectedRoads(),
-                const SizedBox(height: RoadSafeSpacing.xl),
-                _buildOtherAlerts(),
-                const SizedBox(height: RoadSafeSpacing.xl),
-                _buildInfoSection(),
-              ],
-            ),
-          ),
+          _buildFilterChips(provider),
+          Expanded(child: _buildBody(provider)),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChips() {
+  Widget _buildBody(AlertProvider provider) {
+    if (provider.isLoading && provider.alerts.isEmpty) {
+      return const Center(child: RoadSafeCircularProgress());
+    }
+
+    if (provider.error != null && provider.alerts.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(RoadSafeSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(RoadSafeIcons.warningCircle, size: 48, color: RoadSafeColors.error),
+              const SizedBox(height: RoadSafeSpacing.md),
+              Text(
+                provider.error!,
+                textAlign: TextAlign.center,
+                style: RoadSafeTypography.bodyMedium.copyWith(color: RoadSafeColors.error),
+              ),
+              const SizedBox(height: RoadSafeSpacing.lg),
+              RoadSafeSecondaryButton(
+                label: 'Retry',
+                leadingIcon: RoadSafeIcons.refresh,
+                isFullWidth: false,
+                onPressed: () => provider.fetchAlerts(),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (provider.alerts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(RoadSafeIcons.folderOpen, size: 64, color: RoadSafeColors.textTertiary),
+            const SizedBox(height: RoadSafeSpacing.lg),
+            Text('No alerts in this category', style: RoadSafeTypography.headlineSmall),
+          ],
+        ),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(RoadSafeSpacing.screenPadding),
+      children: [
+        if (provider.emergencyAlerts.isNotEmpty) ...[
+          _buildEmergencyAlerts(provider),
+          const SizedBox(height: RoadSafeSpacing.xl),
+        ],
+        if (provider.affectedRoads.isNotEmpty) ...[
+          _buildAffectedRoads(provider),
+          const SizedBox(height: RoadSafeSpacing.xl),
+        ],
+        if (provider.otherAlerts.isNotEmpty) ...[
+          _buildOtherAlerts(provider),
+          const SizedBox(height: RoadSafeSpacing.xl),
+        ],
+        _buildInfoSection(),
+      ],
+    );
+  }
+
+  Widget _buildFilterChips(AlertProvider provider) {
     return Container(
       color: RoadSafeColors.surface,
       height: 56,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: RoadSafeSpacing.screenPadding, vertical: RoadSafeSpacing.sm),
-        itemCount: _filters.length,
+        itemCount: _categories.length,
         separatorBuilder: (_, __) => const SizedBox(width: RoadSafeSpacing.sm),
         itemBuilder: (context, index) {
-          final filter = _filters[index];
-          final isSelected = _selectedFilter == filter;
+          final category = _categories[index];
+          final isSelected = provider.selectedCategory == category;
           return ChoiceChip(
-            label: Text(filter, style: RoadSafeTypography.labelMedium),
+            label: Text(category.categoryDisplay, style: RoadSafeTypography.labelMedium),
             selected: isSelected,
-            onSelected: (_) => setState(() => _selectedFilter = filter),
+            onSelected: (_) => provider.selectCategory(category),
             selectedColor: RoadSafeColors.primaryContainer,
             backgroundColor: RoadSafeColors.background,
             labelStyle: RoadSafeTypography.labelMedium.copyWith(
@@ -167,23 +162,19 @@ class _AlertsScreenState extends State<AlertsScreen> {
     );
   }
 
-  Widget _buildEmergencyAlerts() {
-    final emergencyAlerts = _alerts.where((a) => a.isEmergency).toList();
-
-    if (emergencyAlerts.isEmpty) return const SizedBox.shrink();
-
+  Widget _buildEmergencyAlerts(AlertProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Emergency Alerts', style: RoadSafeTypography.headlineSmall),
         const SizedBox(height: RoadSafeSpacing.lg),
-        ...emergencyAlerts.map((alert) => Padding(
+        ...provider.emergencyAlerts.map((alert) => Padding(
               padding: const EdgeInsets.only(bottom: RoadSafeSpacing.lg),
               child: RoadSafeSafetyAlertCard(
                 title: alert.title,
                 description: alert.description,
                 location: alert.location,
-                distance: '${alert.distanceKm.toStringAsFixed(1)} km',
+                distance: _formatDistance(alert.distanceKm),
                 severity: alert.severityDisplay,
                 imageUrl: alert.imageUrl,
                 icon: _getCategoryIcon(alert.category),
@@ -194,16 +185,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
     );
   }
 
-  Widget _buildAffectedRoads() {
-    final emergencyAlerts = _alerts.where((a) => a.isEmergency && a.affectedRoads.isNotEmpty).toList();
-
-    if (emergencyAlerts.isEmpty) return const SizedBox.shrink();
-
-    final allAffectedRoads = emergencyAlerts
-        .expand((a) => a.affectedRoads)
-        .toSet()
-        .toList();
-
+  Widget _buildAffectedRoads(AlertProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -212,7 +194,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
         Wrap(
           spacing: RoadSafeSpacing.sm,
           runSpacing: RoadSafeSpacing.sm,
-          children: allAffectedRoads.map((road) => Container(
+          children: provider.affectedRoads.map((road) => Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: RoadSafeSpacing.md,
                   vertical: RoadSafeSpacing.sm,
@@ -232,21 +214,19 @@ class _AlertsScreenState extends State<AlertsScreen> {
     );
   }
 
-  Widget _buildOtherAlerts() {
-    final otherAlerts = _alerts.where((a) => !a.isEmergency).toList();
-
+  Widget _buildOtherAlerts(AlertProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Other Active Alerts', style: RoadSafeTypography.headlineSmall),
         const SizedBox(height: RoadSafeSpacing.lg),
-        ...otherAlerts.map((alert) => Padding(
+        ...provider.otherAlerts.map((alert) => Padding(
               padding: const EdgeInsets.only(bottom: RoadSafeSpacing.md),
               child: RoadSafeSafetyAlertCard(
                 title: alert.title,
                 description: alert.description,
                 location: alert.location,
-                distance: '${alert.distanceKm.toStringAsFixed(1)} km',
+                distance: _formatDistance(alert.distanceKm),
                 severity: alert.severityDisplay,
                 imageUrl: alert.imageUrl,
                 icon: _getCategoryIcon(alert.category),
@@ -264,7 +244,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
         children: [
           Row(
             children: [
-              Icon(PhosphorIconsRegular.info, size: 20, color: RoadSafeColors.informational),
+              Icon(RoadSafeIcons.info, size: 20, color: RoadSafeColors.informational),
               const SizedBox(width: RoadSafeSpacing.sm),
               Text('Alert Sources', style: RoadSafeTypography.titleMedium),
             ],
@@ -279,11 +259,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
             spacing: RoadSafeSpacing.sm,
             runSpacing: RoadSafeSpacing.sm,
             children: [
-              _buildSourceChip('IMD', PhosphorIconsRegular.cloud),
-              _buildSourceChip('Traffic Police', PhosphorIconsRegular.shield),
-              _buildSourceChip('Weather Dept', PhosphorIconsRegular.sun),
-              _buildSourceChip('Satellite', PhosphorIconsRegular.satellite),
-              _buildSourceChip('AI Models', PhosphorIconsRegular.cpu),
+              _buildSourceChip('IMD', RoadSafeIcons.cloud),
+              _buildSourceChip('Traffic Police', RoadSafeIcons.shield),
+              _buildSourceChip('Weather Dept', RoadSafeIcons.sun),
+              _buildSourceChip('Satellite', RoadSafeIcons.satellite),
+              _buildSourceChip('AI Models', RoadSafeIcons.cpu),
             ],
           ),
         ],
@@ -291,7 +271,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
     );
   }
 
-  Widget _buildSourceChip(String label, PhosphorIconsRegular icon) {
+  Widget _buildSourceChip(String label, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: RoadSafeSpacing.md,
@@ -313,20 +293,25 @@ class _AlertsScreenState extends State<AlertsScreen> {
     );
   }
 
-  PhosphorIconsRegular _getCategoryIcon(AlertCategory category) {
+  String _formatDistance(double km) {
+    if (km < 1) return '${(km * 1000).round()} m away';
+    return '${km.toStringAsFixed(1)} km away';
+  }
+
+  IconData _getCategoryIcon(AlertCategory category) {
     switch (category) {
       case AlertCategory.road:
-        return PhosphorIconsRegular.roadHorizon;
+        return RoadSafeIcons.roadHorizon;
       case AlertCategory.weather:
-        return PhosphorIconsRegular.cloud;
+        return RoadSafeIcons.cloud;
       case AlertCategory.disaster:
-        return PhosphorIconsRegular.fire;
+        return RoadSafeIcons.fire;
       case AlertCategory.visibility:
-        return PhosphorIconsRegular.eyeClosed;
+        return RoadSafeIcons.eyeClosed;
       case AlertCategory.emergency:
-        return PhosphorIconsRegular.warningCircle;
+        return RoadSafeIcons.warningCircle;
       default:
-        return PhosphorIconsRegular.bell;
+        return RoadSafeIcons.bell;
     }
   }
 }

@@ -47,7 +47,9 @@ class LocationProvider extends ChangeNotifier {
       _currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      _currentAddress = await _getAddressFromPosition(_currentPosition!);
+      if (_currentPosition != null) {
+        _currentAddress = await _getAddressFromPosition(_currentPosition!);
+      }
     } catch (e) {
       _error = 'Failed to get location: ${e.toString()}';
     }
@@ -69,7 +71,7 @@ class LocationProvider extends ChangeNotifier {
           place.subLocality,
           place.locality,
           place.administrativeArea,
-        ].where((s) => s.isNotEmpty).join(', ');
+        ].where((s) => s?.isNotEmpty ?? false).join(', ');
       }
     } catch (_) {}
     return '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
@@ -85,7 +87,7 @@ class LocationProvider extends ChangeNotifier {
           place.subLocality,
           place.locality,
           place.administrativeArea,
-        ].where((s) => s.isNotEmpty).join(', ');
+        ].where((s) => s?.isNotEmpty ?? false).join(', ');
       }
     } catch (_) {}
     return null;

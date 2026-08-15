@@ -168,7 +168,7 @@ class Report {
       imagePublicId: json['imagePublicId'] ?? '',
       verification: Verification.fromJson(json['verification'] ?? {}),
       status: _parseReportStatus(json['status']),
-      communityStatus: _parseCommunityStatus(json['communityStatus']),
+      communityStatus: parseCommunityStatus(json['communityStatus']),
       voteScore: json['voteScore'] ?? 0,
       upvoteCount: json['upvoteCount'] ?? 0,
       downvoteCount: json['downvoteCount'] ?? 0,
@@ -262,7 +262,7 @@ class Report {
     }
   }
 
-  static CommunityStatus _parseCommunityStatus(String? value) {
+  static CommunityStatus parseCommunityStatus(String? value) {
     switch (value?.toUpperCase()) {
       case 'UNVERIFIED':
         return CommunityStatus.unverified;
@@ -397,7 +397,7 @@ class NearbyReport {
       longitude: (json['longitude'] ?? 0).toDouble(),
       imageUrl: json['imageUrl'] ?? '',
       distanceMeters: json['distanceMeters'] ?? 0,
-      communityStatus: Report._parseCommunityStatus(json['communityStatus']),
+      communityStatus: Report.parseCommunityStatus(json['communityStatus']),
       voteScore: json['voteScore'] ?? 0,
       creator: json['createdBy'] != null ? UserSummary.fromJson(json['createdBy']) : null,
     );

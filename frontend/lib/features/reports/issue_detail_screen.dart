@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
@@ -19,7 +18,7 @@ class IssueDetailScreen extends StatelessWidget {
         showBackButton: true,
         actions: [
           IconButton(
-            icon: Icon(PhosphorIconsRegular.threeDots, size: 24),
+            icon: Icon(RoadSafeIcons.more, size: 24),
             onPressed: () => _showMoreMenu(context),
             padding: const EdgeInsets.only(right: RoadSafeSpacing.screenPadding),
           ),
@@ -66,7 +65,7 @@ class IssueDetailScreen extends StatelessWidget {
                   height: 200,
                   color: RoadSafeColors.backgroundAlt,
                   child: Center(
-                    child: Icon(PhosphorIconsRegular.image, size: 48, color: RoadSafeColors.textTertiary),
+                    child: Icon(RoadSafeIcons.image, size: 48, color: RoadSafeColors.textTertiary),
                   ),
                 ),
               ),
@@ -110,7 +109,7 @@ class IssueDetailScreen extends StatelessWidget {
                 const SizedBox(height: RoadSafeSpacing.lg),
                 Row(
                   children: [
-                    Icon(PhosphorIconsRegular.mapPin, size: 16, color: RoadSafeColors.textTertiary),
+                    Icon(RoadSafeIcons.mapPin, size: 16, color: RoadSafeColors.textTertiary),
                     const SizedBox(width: RoadSafeSpacing.xs),
                     Expanded(
                       child: Text(
@@ -123,14 +122,14 @@ class IssueDetailScreen extends StatelessWidget {
                 const SizedBox(height: RoadSafeSpacing.sm),
                 Row(
                   children: [
-                    Icon(PhosphorIconsRegular.calendar, size: 16, color: RoadSafeColors.textTertiary),
+                    Icon(RoadSafeIcons.calendar, size: 16, color: RoadSafeColors.textTertiary),
                     const SizedBox(width: RoadSafeSpacing.xs),
                     Text(
                       _formatDateTime(report.createdAt),
                       style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
                     ),
                     const SizedBox(width: RoadSafeSpacing.md),
-                    Icon(PhosphorIconsRegular.idCard, size: 16, color: RoadSafeColors.textTertiary),
+                    Icon(RoadSafeIcons.idCard, size: 16, color: RoadSafeColors.textTertiary),
                     const SizedBox(width: RoadSafeSpacing.xs),
                     Text(
                       'ID: ${report.id.substring(0, 8)}',
@@ -226,7 +225,7 @@ class IssueDetailScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(PhosphorIconsRegular.map, size: 48, color: RoadSafeColors.textTertiary),
+                  Icon(RoadSafeIcons.mapPin, size: 48, color: RoadSafeColors.textTertiary),
                   const SizedBox(height: RoadSafeSpacing.sm),
                   Text(
                     'Map Preview\n${report.latitude.toStringAsFixed(6)}, ${report.longitude.toStringAsFixed(6)}',
@@ -266,7 +265,7 @@ class IssueDetailScreen extends StatelessWidget {
           const SizedBox(height: RoadSafeSpacing.lg),
           RoadSafePrimaryButton(
             label: 'View on Map',
-            leadingIcon: PhosphorIconsRegular.mapPin,
+            leadingIcon: RoadSafeIcons.mapPin,
             isFullWidth: true,
             onPressed: () => _openInMaps(report.latitude, report.longitude),
           ),
@@ -324,7 +323,7 @@ class IssueDetailScreen extends StatelessWidget {
                   height: 200,
                   color: RoadSafeColors.backgroundAlt,
                   child: Center(
-                    child: Icon(PhosphorIconsRegular.image, size: 48, color: RoadSafeColors.textTertiary),
+                    child: Icon(RoadSafeIcons.image, size: 48, color: RoadSafeColors.textTertiary),
                   ),
                 ),
               ),
@@ -333,7 +332,7 @@ class IssueDetailScreen extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Icon(PhosphorIconsRegular.image, size: 48, color: RoadSafeColors.textTertiary),
+                  Icon(RoadSafeIcons.image, size: 48, color: RoadSafeColors.textTertiary),
                   const SizedBox(height: RoadSafeSpacing.md),
                   Text('No photos available', style: RoadSafeTypography.bodyMedium.copyWith(color: RoadSafeColors.textSecondary)),
                 ],
@@ -349,21 +348,21 @@ class IssueDetailScreen extends StatelessWidget {
       children: [
         RoadSafeSecondaryButton(
           label: 'Share Issue',
-          leadingIcon: PhosphorIconsRegular.share,
+          leadingIcon: RoadSafeIcons.share,
           isFullWidth: true,
           onPressed: _shareIssue,
         ),
         const SizedBox(height: RoadSafeSpacing.md),
         RoadSafeSecondaryButton(
           label: 'Save',
-          leadingIcon: PhosphorIconsRegular.bookmark,
+          leadingIcon: RoadSafeIcons.bookmark,
           isFullWidth: true,
           onPressed: () {},
         ),
         const SizedBox(height: RoadSafeSpacing.md),
         RoadSafeTextButton(
           label: 'Report Incorrect Info',
-          leadingIcon: PhosphorIconsRegular.flag,
+          leadingIcon: RoadSafeIcons.flag,
           textColor: RoadSafeColors.error,
           onPressed: () {},
         ),
@@ -371,29 +370,29 @@ class IssueDetailScreen extends StatelessWidget {
     );
   }
 
-  PhosphorIconsRegular _getHazardIcon(HazardType type) {
+  IconData _getHazardIcon(HazardType type) {
     switch (type) {
       case HazardType.pothole:
-        return PhosphorIconsRegular.pothole;
+        return RoadSafeIcons.pothole;
       case HazardType.accident:
-        return PhosphorIconsRegular.carCrash;
+        return RoadSafeIcons.carCrash;
       case HazardType.fog:
-        return PhosphorIconsRegular.cloudFog;
+        return RoadSafeIcons.cloudFog;
       case HazardType.speedBreaker:
       case HazardType.unmarkedBreaker:
       case HazardType.illegalBreaker:
-        return PhosphorIconsRegular.speedBump;
+        return RoadSafeIcons.speedBump;
       case HazardType.waterlogging:
       case HazardType.waterloggedHazard:
-        return PhosphorIconsRegular.waves;
+        return RoadSafeIcons.waves;
       case HazardType.roadDamage:
-        return PhosphorIconsRegular.roadHorizon;
+        return RoadSafeIcons.roadHorizon;
       case HazardType.construction:
-        return PhosphorIconsRegular.hammer;
+        return RoadSafeIcons.hammer;
       case HazardType.emergency:
-        return PhosphorIconsRegular.warningCircle;
+        return RoadSafeIcons.warningCircle;
       default:
-        return PhosphorIconsRegular.warning;
+        return RoadSafeIcons.warning;
     }
   }
 
@@ -417,7 +416,7 @@ class IssueDetailScreen extends StatelessWidget {
             Text('More Options', style: RoadSafeTypography.headlineSmall),
             const SizedBox(height: RoadSafeSpacing.lg),
             ListTile(
-              leading: Icon(PhosphorIconsRegular.share, color: RoadSafeColors.textPrimary),
+              leading: Icon(RoadSafeIcons.share, color: RoadSafeColors.textPrimary),
               title: Text('Share', style: RoadSafeTypography.bodyMedium),
               onTap: () {
                 Navigator.pop(context);
@@ -425,12 +424,12 @@ class IssueDetailScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(PhosphorIconsRegular.bookmark, color: RoadSafeColors.textPrimary),
+              leading: Icon(RoadSafeIcons.bookmark, color: RoadSafeColors.textPrimary),
               title: Text('Save', style: RoadSafeTypography.bodyMedium),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
-              leading: Icon(PhosphorIconsRegular.flag, color: RoadSafeColors.error),
+              leading: Icon(RoadSafeIcons.flag, color: RoadSafeColors.error),
               title: Text('Report Incorrect', style: RoadSafeTypography.bodyMedium.copyWith(color: RoadSafeColors.error)),
               onTap: () => Navigator.pop(context),
             ),

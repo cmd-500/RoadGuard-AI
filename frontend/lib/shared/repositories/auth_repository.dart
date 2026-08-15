@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dio/dio.dart';
 import '../services/api_client.dart';
-import '../../models/user.dart';
+import '../models/user.dart';
 
 abstract class AuthRepository {
   Future<AuthResult> register(String name, String email, String password);

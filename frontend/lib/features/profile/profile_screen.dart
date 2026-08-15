@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
@@ -25,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: 'Profile',
         actions: [
           IconButton(
-            icon: Icon(PhosphorIconsRegular.gear, size: 24),
+            icon: Icon(RoadSafeIcons.settings, size: 24),
             onPressed: () {},
             padding: const EdgeInsets.only(right: RoadSafeSpacing.screenPadding),
           ),
@@ -38,6 +37,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildProfileHeader(user),
             const SizedBox(height: RoadSafeSpacing.xl),
             _buildStats(user),
+            const SizedBox(height: RoadSafeSpacing.xl),
+            _buildBadges(user),
             const SizedBox(height: RoadSafeSpacing.xl),
             _buildMainCTA(),
             const SizedBox(height: RoadSafeSpacing.xl),
@@ -63,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: RoadSafeColors.primaryContainer,
                 backgroundImage: user?.avatarUrl != null ? NetworkImage(user!.avatarUrl!) : null,
                 child: user?.avatarUrl == null
-                    ? Icon(PhosphorIconsRegular.user, size: 50, color: RoadSafeColors.primary)
+                    ? Icon(RoadSafeIcons.user, size: 50, color: RoadSafeColors.primary)
                     : null,
               ),
               if (user?.isTrusted == true)
@@ -77,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(color: RoadSafeColors.surface, width: 3),
                     ),
-                    child: Icon(PhosphorIconsRegular.star, size: 14, color: RoadSafeColors.textOnPrimary),
+                    child: Icon(RoadSafeIcons.star, size: 14, color: RoadSafeColors.textOnPrimary),
                   ),
                 ),
             ],
@@ -107,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(PhosphorIconsRegular.mapPin, size: 16, color: RoadSafeColors.textTertiary),
+                Icon(RoadSafeIcons.mapPin, size: 16, color: RoadSafeColors.textTertiary),
                 const SizedBox(width: RoadSafeSpacing.xs),
                 Text(
                   user!.location!,
@@ -130,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(PhosphorIconsRegular.shieldCheck, size: 14, color: RoadSafeColors.success),
+                  Icon(RoadSafeIcons.shieldCheck, size: 14, color: RoadSafeColors.success),
                   const SizedBox(width: RoadSafeSpacing.xs),
                   Text(
                     'Trusted Reporter • ${user!.trustScore} Trust Score',
@@ -152,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.all(RoadSafeSpacing.lg),
             child: Column(
               children: [
-                Icon(PhosphorIconsRegular.flag, size: 32, color: RoadSafeColors.primary),
+                Icon(RoadSafeIcons.flag, size: 32, color: RoadSafeColors.primary),
                 const SizedBox(height: RoadSafeSpacing.sm),
                 Text(
                   '${user?.reportsSubmitted ?? 0}',
@@ -172,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.all(RoadSafeSpacing.lg),
             child: Column(
               children: [
-                Icon(PhosphorIconsRegular.checkCircle, size: 32, color: RoadSafeColors.success),
+                Icon(RoadSafeIcons.checkCircle, size: 32, color: RoadSafeColors.success),
                 const SizedBox(height: RoadSafeSpacing.sm),
                 Text(
                   '${user?.reportsConfirmed ?? 0}',
@@ -188,6 +189,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildBadges(User? user) {
+    final badges = _computeBadges(user);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('My Badges', style: RoadSafeTypography.headlineSmall),
+            RoadSafeTextButton(
+              label: 'View All',
+              onPressed: () {},
+              trailingIcon: RoadSafeIcons.caretRight,
+            ),
+          ],
+        ),
+        const SizedBox(height: RoadSafeSpacing.md),
+        SizedBox(
+          height: 96,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: badges.length,
+            separatorBuilder: (_, __) => const SizedBox(width: RoadSafeSpacing.lg),
+            itemBuilder: (context, index) => _buildBadgeItem(badges[index]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBadgeItem(_ProfileBadge badge) {
+    final color = badge.unlocked ? RoadSafeColors.primary : RoadSafeColors.textTertiary;
+    final background = badge.unlocked ? RoadSafeColors.primaryContainer : RoadSafeColors.backgroundAlt;
+
+    return SizedBox(
+      width: 72,
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: background,
+              shape: BoxShape.circle,
+              border: badge.unlocked ? null : Border.all(color: RoadSafeColors.border),
+            ),
+            child: Icon(badge.icon, size: 26, color: color),
+          ),
+          const SizedBox(height: RoadSafeSpacing.xs),
+          Text(
+            badge.title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: RoadSafeTypography.labelSmall.copyWith(
+              color: badge.unlocked ? RoadSafeColors.textPrimary : RoadSafeColors.textTertiary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<_ProfileBadge> _computeBadges(User? user) {
+    final submitted = user?.reportsSubmitted ?? 0;
+    final confirmed = user?.reportsConfirmed ?? 0;
+    final isTrusted = user?.isTrusted ?? false;
+
+    return [
+      _ProfileBadge(title: 'First Reporter', icon: RoadSafeIcons.flag, unlocked: submitted >= 1),
+      _ProfileBadge(title: 'Community Helper', icon: RoadSafeIcons.users, unlocked: confirmed >= 5),
+      _ProfileBadge(title: 'Active Contributor', icon: RoadSafeIcons.fire, unlocked: submitted >= 10),
+      _ProfileBadge(title: 'Top Reporter', icon: RoadSafeIcons.star, unlocked: submitted >= 25),
+      _ProfileBadge(title: 'Road Guardian', icon: RoadSafeIcons.shieldCheck, unlocked: isTrusted),
+    ];
   }
 
   Widget _buildMainCTA() {
@@ -214,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: RoadSafeColors.textOnPrimary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(RoadSafeRadius.lg),
                 ),
-                child: Icon(PhosphorIconsRegular.flag, size: 28, color: RoadSafeColors.textOnPrimary),
+                child: Icon(RoadSafeIcons.flag, size: 28, color: RoadSafeColors.textOnPrimary),
               ),
               const SizedBox(width: RoadSafeSpacing.md),
               Expanded(
@@ -255,25 +334,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: 'Account',
         items: [
           _ProfileMenuItem(
-            icon: PhosphorIconsRegular.user,
+            icon: RoadSafeIcons.user,
             title: 'My Profile',
             subtitle: 'Manage your account',
             onTap: () {},
           ),
           _ProfileMenuItem(
-            icon: PhosphorIconsRegular.flag,
+            icon: RoadSafeIcons.flag,
             title: 'My Reports',
             subtitle: 'View submitted reports',
             onTap: () {},
           ),
           _ProfileMenuItem(
-            icon: PhosphorIconsRegular.heart,
+            icon: RoadSafeIcons.heart,
             title: 'Favorites',
             subtitle: 'Saved locations & routes',
             onTap: () {},
           ),
           _ProfileMenuItem(
-            icon: PhosphorIconsRegular.bell,
+            icon: RoadSafeIcons.bell,
             title: 'Notifications',
             subtitle: 'Alert preferences',
             onTap: () {},
@@ -284,7 +363,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: 'Safety',
         items: [
           _ProfileMenuItem(
-            icon: PhosphorIconsRegular.shield,
+            icon: RoadSafeIcons.shield,
             title: 'Safety Tips',
             subtitle: 'Road safety guidelines',
             onTap: () {},
@@ -295,7 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: 'App',
         items: [
           _ProfileMenuItem(
-            icon: PhosphorIconsRegular.info,
+            icon: RoadSafeIcons.info,
             title: 'About',
             subtitle: 'Version 1.0.0',
             onTap: () {},
@@ -306,58 +385,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Column(
       children: sections.map((section) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (section.title.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.only(left: RoadSafeSpacing.sm, bottom: RoadSafeSpacing.sm),
-                  child: Text(
-                    section.title,
-                    style: RoadSafeTypography.labelSmall.copyWith(
-                      color: RoadSafeColors.textTertiary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (section.title.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: RoadSafeSpacing.sm, bottom: RoadSafeSpacing.sm),
+              child: Text(
+                section.title,
+                style: RoadSafeTypography.labelSmall.copyWith(
+                  color: RoadSafeColors.textTertiary,
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-              ...section.items.map((item) => _buildMenuItem(item)),
-            ],
-          )).toList(),
+              ),
+            ),
+          ],
+          ...section.items.map((item) => _buildMenuItem(item)),
+        ],
+      )).toList(),
     );
   }
 
   Widget _buildMenuItem(_ProfileMenuItem item) {
-    return RoadSafeCard(
-      margin: const EdgeInsets.only(bottom: RoadSafeSpacing.sm),
-      padding: const EdgeInsets.all(RoadSafeSpacing.md),
-      onTap: item.onTap,
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: RoadSafeColors.primaryContainer,
-              borderRadius: BorderRadius.circular(RoadSafeRadius.lg),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: RoadSafeSpacing.sm),
+      child: RoadSafeCard(
+        padding: const EdgeInsets.all(RoadSafeSpacing.md),
+        onTap: item.onTap,
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: RoadSafeColors.primaryContainer,
+                borderRadius: BorderRadius.circular(RoadSafeRadius.lg),
+              ),
+              child: Icon(item.icon, size: 22, color: RoadSafeColors.primary),
             ),
-            child: Icon(item.icon, size: 22, color: RoadSafeColors.primary),
-          ),
-          const SizedBox(width: RoadSafeSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item.title, style: RoadSafeTypography.titleMedium),
-                if (item.subtitle != null)
-                  Text(
-                    item.subtitle!,
-                    style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
-                  ),
-              ],
+            const SizedBox(width: RoadSafeSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(item.title, style: RoadSafeTypography.titleMedium),
+                  if (item.subtitle != null)
+                    Text(
+                      item.subtitle!,
+                      style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
+                    ),
+                ],
+              ),
             ),
-          ),
-          Icon(PhosphorIconsRegular.caretRight, size: 20, color: RoadSafeColors.textTertiary),
-        ],
+            Icon(RoadSafeIcons.caretRight, size: 20, color: RoadSafeColors.textTertiary),
+          ],
+        ),
       ),
     );
   }
@@ -367,14 +448,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         RoadSafeSecondaryButton(
           label: 'Share App',
-          leadingIcon: PhosphorIconsRegular.share,
+          leadingIcon: RoadSafeIcons.share,
           isFullWidth: true,
           onPressed: () {},
         ),
         const SizedBox(height: RoadSafeSpacing.md),
         RoadSafeTextButton(
           label: 'Logout',
-          leadingIcon: PhosphorIconsRegular.signOut,
+          leadingIcon: RoadSafeIcons.signOut,
           textColor: RoadSafeColors.error,
           onPressed: () => _showLogoutDialog(),
         ),
@@ -408,6 +489,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
+class _ProfileBadge {
+  final String title;
+  final IconData icon;
+  final bool unlocked;
+
+  const _ProfileBadge({
+    required this.title,
+    required this.icon,
+    required this.unlocked,
+  });
+}
+
 class _ProfileSection {
   final String title;
   final List<_ProfileMenuItem> items;
@@ -416,7 +509,7 @@ class _ProfileSection {
 }
 
 class _ProfileMenuItem {
-  final PhosphorIconsRegular icon;
+  final IconData icon;
   final String title;
   final String? subtitle;
   final VoidCallback onTap;

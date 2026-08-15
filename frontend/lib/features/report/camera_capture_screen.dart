@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:camera/camera.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
@@ -149,7 +148,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(PhosphorIconsRegular.cameraSlash, size: 64, color: RoadSafeColors.error),
+            Icon(RoadSafeIcons.camera, size: 64, color: RoadSafeColors.error),
             const SizedBox(height: RoadSafeSpacing.lg),
             Text(
               'Camera Error',
@@ -221,7 +220,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
                 padding: const EdgeInsets.only(bottom: RoadSafeSpacing.xs),
                 child: Row(
                   children: [
-                    Icon(PhosphorIconsRegular.check, size: 14, color: RoadSafeColors.success),
+                    Icon(RoadSafeIcons.check, size: 14, color: RoadSafeColors.success),
                     const SizedBox(width: RoadSafeSpacing.sm),
                     Text(tip, style: RoadSafeTypography.bodySmall),
                   ],
@@ -251,7 +250,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             RoadSafeIconButton(
-              icon: PhosphorIconsRegular.arrowsClockwise,
+              icon: RoadSafeIcons.refresh,
               onPressed: _switchCamera,
               backgroundColor: RoadSafeColors.surface.withValues(alpha: 0.9),
               iconColor: RoadSafeColors.textPrimary,
@@ -278,14 +277,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
                         ),
                       )
                     : Icon(
-                        PhosphorIconsRegular.camera,
+                        RoadSafeIcons.camera,
                         size: 32,
                         color: RoadSafeColors.textPrimary,
                       ),
               ),
             ),
             RoadSafeIconButton(
-              icon: PhosphorIconsRegular.flashAuto,
+              icon: RoadSafeIcons.flash,
               onPressed: _toggleFlash,
               backgroundColor: RoadSafeColors.surface.withValues(alpha: 0.9),
               iconColor: RoadSafeColors.textPrimary,
@@ -330,7 +329,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
                   child: RoadSafeInfoCard(
                     title: 'Photo Captured',
                     message: 'Review the photo and continue to submit your report.',
-                    icon: PhosphorIconsRegular.checkCircle,
+                    icon: RoadSafeIcons.checkCircle,
                     backgroundColor: RoadSafeColors.successLight,
                     borderColor: RoadSafeColors.success,
                   ),
@@ -364,7 +363,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
             Expanded(
               child: RoadSafeSecondaryButton(
                 label: 'Retake',
-                leadingIcon: PhosphorIconsRegular.arrowCounterClockwise,
+                leadingIcon: RoadSafeIcons.retake,
                 onPressed: _retakePhoto,
               ),
             ),
@@ -372,7 +371,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
             Expanded(
               child: RoadSafePrimaryButton(
                 label: 'Use Photo',
-                trailingIcon: PhosphorIconsRegular.arrowRight,
+                trailingIcon: RoadSafeIcons.forward,
                 onPressed: () {}, // Navigation handled by parent
               ),
             ),

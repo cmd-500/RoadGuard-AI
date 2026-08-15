@@ -6,3 +6,4 @@ export 'app_bars.dart';
 export 'bottom_navigation.dart';
 export 'inputs.dart';
 export 'progress.dart';
+export 'hazard_icon.dart';

@@ -20,7 +20,6 @@ class _MapScreenState extends State<MapScreen> {
   LatLng _center = const LatLng(28.6139, 77.2090);
   String _selectedFilter = 'All';
   final List<String> _filters = ['All', 'Potholes', 'Accidents', 'Fog', 'Speed Breakers'];
-  bool _showBottomSheet = true;
 
   @override
   void initState() {
@@ -47,6 +46,12 @@ class _MapScreenState extends State<MapScreen> {
       longitude: _center.longitude,
       radiusMeters: 5000,
     );
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,19 +91,19 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       width: 48,
                       height: 48,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: RoadSafeColors.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: RoadSafeColors.surface, width: 3),
-                              boxShadow: RoadSafeShadows.fab,
-                            ),
-                            child: Icon(
-                              RoadSafeIcons.mapPin,
-                              size: 24,
-                              color: RoadSafeColors.textOnPrimary,
-                            ),
-                          ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: RoadSafeColors.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: RoadSafeColors.surface, width: 3),
+                          boxShadow: RoadSafeShadows.fab,
+                        ),
+                        child: Icon(
+                          RoadSafeIcons.mapPin,
+                          size: 24,
+                          color: RoadSafeColors.textOnPrimary,
+                        ),
+                      ),
                     ),
                   ...reportProvider.nearbyReports.map((report) => _buildHazardMarker(report)),
                 ],
@@ -111,34 +116,38 @@ class _MapScreenState extends State<MapScreen> {
             right: RoadSafeSpacing.screenPadding,
             child: _buildFilterChips(),
           ),
-          if (_showBottomSheet)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: _buildBottomSheet(reportProvider),
-            ),
-          Positioned(
-            bottom: _showBottomSheet ? 220 : RoadSafeSpacing.xxl,
-            right: RoadSafeSpacing.screenPadding,
-            child: _buildMapControls(),
-          ),
+          _buildBottomSheet(reportProvider),
+          _buildMapControls(),
         ],
       ),
     );
   }
 
+  static const Map<String, IconData> _filterIcons = {
+    'All': RoadSafeIcons.layers,
+    'Potholes': RoadSafeIcons.pothole,
+    'Accidents': RoadSafeIcons.carCrash,
+    'Fog': RoadSafeIcons.cloudFog,
+    'Speed Breakers': RoadSafeIcons.speedBump,
+  };
+
   Widget _buildFilterChips() {
     return SizedBox(
-      height: 40,
+      height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: RoadSafeSpacing.screenPadding, vertical: RoadSafeSpacing.sm),
         itemCount: _filters.length,
         separatorBuilder: (_, __) => const SizedBox(width: RoadSafeSpacing.sm),
         itemBuilder: (context, index) {
           final filter = _filters[index];
           final isSelected = _selectedFilter == filter;
           return ChoiceChip(
+            avatar: Icon(
+              _filterIcons[filter] ?? RoadSafeIcons.warning,
+              size: 16,
+              color: isSelected ? RoadSafeColors.primary : RoadSafeColors.textSecondary,
+            ),
             label: Text(filter, style: RoadSafeTypography.labelMedium),
             selected: isSelected,
             onSelected: (_) => setState(() => _selectedFilter = filter),
@@ -163,7 +172,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _buildHazardMarker(NearbyReport report) {
+  Marker _buildHazardMarker(NearbyReport report) {
     final color = RoadSafeColors.hazardColor(report.hazardType.name);
 
     return Marker(
@@ -216,58 +225,67 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _buildBottomSheet(ReportProvider provider) {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        color: RoadSafeColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(RoadSafeRadius.xxl)),
-        boxShadow: RoadSafeShadows.bottomSheet,
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(top: RoadSafeSpacing.md),
-            decoration: BoxDecoration(
-              color: RoadSafeColors.border,
-              borderRadius: BorderRadius.circular(RoadSafeRadius.round),
-            ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.25,
+      minChildSize: 0.15,
+      maxChildSize: 0.7,
+      snap: true,
+      snapSizes: const [0.15, 0.25, 0.5, 0.7],
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: RoadSafeColors.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(RoadSafeRadius.xxl)),
+            boxShadow: RoadSafeShadows.bottomSheet,
           ),
-          Padding(
-            padding: const EdgeInsets.all(RoadSafeSpacing.lg),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Nearby Alerts', style: RoadSafeTypography.titleMedium),
-                IconButton(
-                  icon: Icon(RoadSafeIcons.close, size: 20),
-                  onPressed: () => setState(() => _showBottomSheet = false),
-                  padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: RoadSafeSpacing.md),
+                decoration: BoxDecoration(
+                  color: RoadSafeColors.border,
+                  borderRadius: BorderRadius.circular(RoadSafeRadius.round),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: provider.nearbyReports.isEmpty
-                ? Center(
-                    child: Text(
-                      'No alerts nearby',
-                      style: RoadSafeTypography.bodyMedium.copyWith(color: RoadSafeColors.textSecondary),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(RoadSafeSpacing.lg),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Nearby Alerts', style: RoadSafeTypography.titleMedium),
+                    IconButton(
+                      icon: Icon(RoadSafeIcons.close, size: 20),
+                      onPressed: () {},
+                      padding: EdgeInsets.zero,
                     ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: RoadSafeSpacing.screenPadding),
-                    itemCount: provider.nearbyReports.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: RoadSafeSpacing.sm),
-                    itemBuilder: (context, index) {
-                      final report = provider.nearbyReports[index];
-                      return _buildBottomSheetAlert(report);
-                    },
+                  ],
+                ),
+              ),
+              Expanded(
+                child: provider.nearbyReports.isEmpty
+                    ? Center(
+                  child: Text(
+                    'No alerts nearby',
+                    style: RoadSafeTypography.bodyMedium.copyWith(color: RoadSafeColors.textSecondary),
                   ),
+                )
+                    : ListView.separated(
+                  controller: scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: RoadSafeSpacing.screenPadding),
+                  itemCount: provider.nearbyReports.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: RoadSafeSpacing.sm),
+                  itemBuilder: (context, index) {
+                    final report = provider.nearbyReports[index];
+                    return _buildBottomSheetAlert(report);
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -281,18 +299,9 @@ class _MapScreenState extends State<MapScreen> {
       ),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: RoadSafeColors.hazardColor(report.hazardType.name).withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(RoadSafeRadius.md),
-            ),
-            child: Icon(
-              _getHazardIcon(report.hazardType),
-              size: 20,
-              color: RoadSafeColors.hazardColor(report.hazardType.name),
-            ),
+          RoadSafeHazardIcon(
+            hazardType: report.hazardType.name,
+            size: RoadSafeHazardIconSize.medium,
           ),
           const SizedBox(width: RoadSafeSpacing.md),
           Expanded(
@@ -317,38 +326,42 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _buildMapControls() {
-    return Column(
-      children: [
-        RoadSafeIconButton(
-          icon: RoadSafeIcons.layers,
-          onPressed: () {},
-          backgroundColor: RoadSafeColors.surface,
-          iconColor: RoadSafeColors.textPrimary,
-          size: 48,
-          iconSize: 24,
-          tooltip: 'Map Layers',
-        ),
-        const SizedBox(height: RoadSafeSpacing.sm),
-        RoadSafeIconButton(
-          icon: RoadSafeIcons.navigation,
-          onPressed: () {},
-          backgroundColor: RoadSafeColors.surface,
-          iconColor: RoadSafeColors.textPrimary,
-          size: 48,
-          iconSize: 24,
-          tooltip: 'Navigation',
-        ),
-        const SizedBox(height: RoadSafeSpacing.sm),
-        RoadSafeIconButton(
-          icon: RoadSafeIcons.location,
-          onPressed: _recenterMap,
-          backgroundColor: RoadSafeColors.primary,
-          iconColor: RoadSafeColors.textOnPrimary,
-          size: 48,
-          iconSize: 24,
-          tooltip: 'Current Location',
-        ),
-      ],
+    return Positioned(
+      bottom: RoadSafeSpacing.xxl,
+      right: RoadSafeSpacing.screenPadding,
+      child: Column(
+        children: [
+          RoadSafeIconButton(
+            icon: RoadSafeIcons.layers,
+            onPressed: () {},
+            backgroundColor: RoadSafeColors.surface,
+            iconColor: RoadSafeColors.textPrimary,
+            size: 48,
+            iconSize: 24,
+            tooltip: 'Map Layers',
+          ),
+          const SizedBox(height: RoadSafeSpacing.sm),
+          RoadSafeIconButton(
+            icon: RoadSafeIcons.navigation,
+            onPressed: () {},
+            backgroundColor: RoadSafeColors.surface,
+            iconColor: RoadSafeColors.textPrimary,
+            size: 48,
+            iconSize: 24,
+            tooltip: 'Navigation',
+          ),
+          const SizedBox(height: RoadSafeSpacing.sm),
+          RoadSafeIconButton(
+            icon: RoadSafeIcons.location,
+            onPressed: _recenterMap,
+            backgroundColor: RoadSafeColors.primary,
+            iconColor: RoadSafeColors.textOnPrimary,
+            size: 48,
+            iconSize: 24,
+            tooltip: 'Current Location',
+          ),
+        ],
+      ),
     );
   }
 
@@ -444,18 +457,9 @@ class _MapScreenState extends State<MapScreen> {
                   children: [
                     Row(
                       children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: RoadSafeColors.hazardColor(report.hazardType.name).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(RoadSafeRadius.lg),
-                          ),
-                          child: Icon(
-                            _getHazardIcon(report.hazardType),
-                            size: 24,
-                            color: RoadSafeColors.hazardColor(report.hazardType.name),
-                          ),
+                        RoadSafeHazardIcon(
+                          hazardType: report.hazardType.name,
+                          size: RoadSafeHazardIconSize.large,
                         ),
                         const SizedBox(width: RoadSafeSpacing.md),
                         Expanded(

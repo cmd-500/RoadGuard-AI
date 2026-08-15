@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
@@ -20,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   RoadSafeTab _currentTab = RoadSafeTab.home;
+  final MapController _homeMapController = MapController();
 
   @override
   void initState() {
@@ -28,6 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
       context.read<LocationProvider>().getCurrentLocation();
       context.read<ReportProvider>().fetchReports();
     });
+  }
+
+  @override
+  void dispose() {
+    _homeMapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,20 +81,28 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(RoadSafeSpacing.screenPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildGreetingSection(userName),
-              const SizedBox(height: RoadSafeSpacing.xxl),
-              _buildSearchField(),
-              const SizedBox(height: RoadSafeSpacing.xxl),
-              _buildQuickActions(),
-              const SizedBox(height: RoadSafeSpacing.xxl),
-              _buildNearbyAlerts(),
-            ],
-          ),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(RoadSafeSpacing.screenPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildGreetingSection(userName),
+                    const SizedBox(height: RoadSafeSpacing.xxl),
+                    _buildSearchField(),
+                    const SizedBox(height: RoadSafeSpacing.xxl),
+                    _buildMapPreview(locationProvider),
+                    const SizedBox(height: RoadSafeSpacing.xxl),
+                    _buildQuickActions(),
+                    const SizedBox(height: RoadSafeSpacing.xxl),
+                    _buildNearbyAlerts(),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -123,19 +140,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: RoadSafeColors.primaryContainer,
-              borderRadius: BorderRadius.circular(RoadSafeRadius.xl),
-            ),
-            child: Icon(
-              RoadSafeIcons.car,
-              size: 40,
-              color: RoadSafeColors.primary,
-            ),
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: RoadSafeColors.primaryContainer,
+            borderRadius: BorderRadius.circular(RoadSafeRadius.xl),
           ),
+          child: Icon(
+            RoadSafeIcons.car,
+            size: 40,
+            color: RoadSafeColors.primary,
+          ),
+        ),
       ],
     );
   }
@@ -148,10 +165,195 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildMapPreview(LocationProvider locationProvider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text('Live Map', style: RoadSafeTypography.headlineSmall),
+            RoadSafeTextButton(
+              label: 'Fullscreen',
+              leadingIcon: Icons.open_in_full,
+              onPressed: () => _changeTab(RoadSafeTab.map),
+            ),
+          ],
+        ),
+        const SizedBox(height: RoadSafeSpacing.md),
+        Container(
+          height: 220,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(RoadSafeRadius.xl),
+            border: Border.all(color: RoadSafeColors.border),
+            boxShadow: RoadSafeShadows.card,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(RoadSafeRadius.xl),
+            child: Stack(
+              children: <Widget>[
+                FlutterMap(
+                  mapController: _homeMapController,
+                  options: MapOptions(
+                    initialCenter: _getHomeMapCenter(locationProvider),
+                    initialZoom: 13,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                    ),
+                  ),
+                  children: <Widget>[
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.roadsafes.app',
+                    ),
+                    MarkerLayer(
+                      markers: _buildHomeMapMarkers(),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  top: RoadSafeSpacing.md,
+                  right: RoadSafeSpacing.md,
+                  child: RoadSafeIconButton(
+                    icon: Icons.open_in_full,
+                    onPressed: () => _changeTab(RoadSafeTab.map),
+                    backgroundColor: RoadSafeColors.surface,
+                    iconColor: RoadSafeColors.textPrimary,
+                    size: 40,
+                    iconSize: 20,
+                    tooltip: 'Open fullscreen map',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  LatLng _getHomeMapCenter(LocationProvider locationProvider) {
+    if (locationProvider.currentPosition != null) {
+      return LatLng(
+        locationProvider.currentPosition!.latitude,
+        locationProvider.currentPosition!.longitude,
+      );
+    }
+    return const LatLng(28.6139, 77.2090);
+  }
+
+  List<Marker> _buildHomeMapMarkers() {
+    final reportProvider = context.read<ReportProvider>();
+    final markers = <Marker>[];
+
+    // Current location marker
+    final locProvider = context.read<LocationProvider>();
+    if (locProvider.currentPosition != null) {
+      markers.add(
+        Marker(
+          point: LatLng(
+            locProvider.currentPosition!.latitude,
+            locProvider.currentPosition!.longitude,
+          ),
+          width: 40,
+          height: 40,
+          child: Container(
+            decoration: BoxDecoration(
+              color: RoadSafeColors.primary,
+              shape: BoxShape.circle,
+              border: Border.all(color: RoadSafeColors.surface, width: 3),
+              boxShadow: RoadSafeShadows.fab,
+            ),
+            child: Icon(
+              RoadSafeIcons.mapPin,
+              size: 20,
+              color: RoadSafeColors.textOnPrimary,
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Nearby hazard markers (limit to 10 for performance on preview)
+    final reports = reportProvider.nearbyReports.take(10).toList();
+    for (final report in reports) {
+      final color = RoadSafeColors.hazardColor(report.hazardType.name);
+      markers.add(
+        Marker(
+          point: LatLng(report.latitude, report.longitude),
+          width: 32,
+          height: 32,
+          child: GestureDetector(
+            onTap: () => _showQuickHazardInfo(report),
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(color: RoadSafeColors.surface, width: 2),
+                boxShadow: RoadSafeShadows.card,
+              ),
+              child: Icon(
+                _getHazardIcon(report.hazardType),
+                size: 14,
+                color: RoadSafeColors.textOnPrimary,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return markers;
+  }
+
+  IconData _getHazardIcon(HazardType type) {
+    switch (type) {
+      case HazardType.pothole:
+        return RoadSafeIcons.pothole;
+      case HazardType.accident:
+        return RoadSafeIcons.carCrash;
+      case HazardType.fog:
+        return RoadSafeIcons.cloudFog;
+      case HazardType.speedBreaker:
+      case HazardType.unmarkedBreaker:
+      case HazardType.illegalBreaker:
+        return RoadSafeIcons.speedBump;
+      case HazardType.waterlogging:
+      case HazardType.waterloggedHazard:
+        return RoadSafeIcons.waves;
+      case HazardType.roadDamage:
+        return RoadSafeIcons.roadHorizon;
+      case HazardType.construction:
+        return RoadSafeIcons.hammer;
+      case HazardType.emergency:
+        return RoadSafeIcons.warningCircle;
+      default:
+        return RoadSafeIcons.warning;
+    }
+  }
+
+  void _showQuickHazardInfo(NearbyReport report) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${report.hazardType.name.replaceAll('_', ' ').toUpperCase()} - ${(report.distanceMeters / 1000).toStringAsFixed(1)} km',
+          style: RoadSafeTypography.bodyMedium,
+        ),
+        backgroundColor: RoadSafeColors.hazardColor(report.hazardType.name),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _changeTab(RoadSafeTab tab) {
+    setState(() => _currentTab = tab);
+  }
+
   Widget _buildQuickActions() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Text('Quick Actions', style: RoadSafeTypography.headlineSmall),
         const SizedBox(height: RoadSafeSpacing.lg),
         GridView.count(
@@ -160,35 +362,37 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: RoadSafeSpacing.md,
           mainAxisSpacing: RoadSafeSpacing.md,
-          childAspectRatio: 1.1,
-          children: [
+          // Fixed design ratio (not a pixel height) — card height scales
+          // automatically with whatever width the grid column gets.
+          childAspectRatio: 0.98,
+          children: <Widget>[
             RoadSafeQuickActionCard(
               title: 'Real-time Alerts',
-              subtitle: 'Nearby hazards & warnings',
+              subtitle: 'Stay informed',
               icon: RoadSafeIcons.alerts,
               iconBackgroundColor: RoadSafeColors.informationalLight,
               iconColor: RoadSafeColors.informational,
-              onTap: () => setState(() => _currentTab = RoadSafeTab.alerts),
+              onTap: () => _changeTab(RoadSafeTab.alerts),
             ),
             RoadSafeQuickActionCard(
               title: 'Report Issue',
-              subtitle: 'Report road hazards',
+              subtitle: 'Help others',
               icon: RoadSafeIcons.report,
               iconBackgroundColor: RoadSafeColors.primaryContainer,
               iconColor: RoadSafeColors.primary,
-              onTap: () => setState(() => _currentTab = RoadSafeTab.report),
+              onTap: () => _changeTab(RoadSafeTab.report),
             ),
             RoadSafeQuickActionCard(
               title: 'Plan Your Trip',
-              subtitle: 'Safe route navigation',
+              subtitle: 'Safe route',
               icon: RoadSafeIcons.map,
               iconBackgroundColor: RoadSafeColors.successLight,
               iconColor: RoadSafeColors.success,
-              onTap: () => setState(() => _currentTab = RoadSafeTab.map),
+              onTap: () => _changeTab(RoadSafeTab.map),
             ),
             RoadSafeQuickActionCard(
               title: 'Rewards',
-              subtitle: 'Earn points for reports',
+              subtitle: 'Earn & Redeem',
               icon: RoadSafeIcons.gift,
               iconBackgroundColor: RoadSafeColors.warningLight,
               iconColor: RoadSafeColors.warning,
@@ -205,14 +409,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+          children: <Widget>[
             Text('Nearby Alerts', style: RoadSafeTypography.headlineSmall),
             RoadSafeTextButton(
               label: 'View All',
-              onPressed: () => setState(() => _currentTab = RoadSafeTab.map),
+              onPressed: () => _changeTab(RoadSafeTab.map),
               trailingIcon: RoadSafeIcons.caretRight,
             ),
           ],
@@ -248,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return RoadSafeCard(
       padding: const EdgeInsets.all(RoadSafeSpacing.xxl),
       child: Column(
-        children: [
+        children: <Widget>[
           Icon(RoadSafeIcons.checkCircle, size: 48, color: RoadSafeColors.success),
           const SizedBox(height: RoadSafeSpacing.md),
           Text(

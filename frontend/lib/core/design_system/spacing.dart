@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'colors.dart';
+
 class RoadSafeSpacing {
   RoadSafeSpacing._();
 
@@ -33,89 +36,89 @@ class RoadSafeRadius {
 class RoadSafeShadows {
   RoadSafeShadows._();
 
-  static const List<BoxShadow> card = [
-    BoxShadow(
-      color: RoadSafeColors.shadow,
-      offset: Offset(0, 2),
-      blurRadius: 8,
-      spreadRadius: 0,
-    ),
-    BoxShadow(
-      color: RoadSafeColors.shadow,
-      offset: Offset(0, 1),
-      blurRadius: 2,
-      spreadRadius: 0,
-    ),
-  ];
+  static List<BoxShadow> get card => [
+        BoxShadow(
+          color: RoadSafeColors.shadow,
+          offset: const Offset(0, 2),
+          blurRadius: 8,
+          spreadRadius: 0,
+        ),
+        BoxShadow(
+          color: RoadSafeColors.shadow,
+          offset: const Offset(0, 1),
+          blurRadius: 2,
+          spreadRadius: 0,
+        ),
+      ];
 
-  static const List<BoxShadow> cardElevated = [
-    BoxShadow(
-      color: RoadSafeColors.shadowStrong,
-      offset: Offset(0, 4),
-      blurRadius: 16,
-      spreadRadius: 0,
-    ),
-    BoxShadow(
-      color: RoadSafeColors.shadow,
-      offset: Offset(0, 2),
-      blurRadius: 4,
-      spreadRadius: 0,
-    ),
-  ];
+  static List<BoxShadow> get cardElevated => [
+        BoxShadow(
+          color: RoadSafeColors.shadowStrong,
+          offset: const Offset(0, 4),
+          blurRadius: 16,
+          spreadRadius: 0,
+        ),
+        BoxShadow(
+          color: RoadSafeColors.shadow,
+          offset: const Offset(0, 2),
+          blurRadius: 4,
+          spreadRadius: 0,
+        ),
+      ];
 
-  static const List<BoxShadow> bottomSheet = [
-    BoxShadow(
-      color: RoadSafeColors.shadowStrong,
-      offset: Offset(0, -4),
-      blurRadius: 20,
-      spreadRadius: 0,
-    ),
-  ];
+  static List<BoxShadow> get bottomSheet => [
+        BoxShadow(
+          color: RoadSafeColors.shadowStrong,
+          offset: const Offset(0, -4),
+          blurRadius: 20,
+          spreadRadius: 0,
+        ),
+      ];
 
-  static const List<BoxShadow> fab = [
-    BoxShadow(
-      color: RoadSafeColors.shadowStrong,
-      offset: Offset(0, 4),
-      blurRadius: 12,
-      spreadRadius: 0,
-    ),
-  ];
+  static List<BoxShadow> get fab => [
+        BoxShadow(
+          color: RoadSafeColors.shadowStrong,
+          offset: const Offset(0, 4),
+          blurRadius: 12,
+          spreadRadius: 0,
+        ),
+      ];
 
-  static const List<BoxShadow> modal = [
-    BoxShadow(
-      color: RoadSafeColors.shadowStrong,
-      offset: Offset(0, 8),
-      blurRadius: 24,
-      spreadRadius: 0,
-    ),
-  ];
+  static List<BoxShadow> get modal => [
+        BoxShadow(
+          color: RoadSafeColors.shadowStrong,
+          offset: const Offset(0, 8),
+          blurRadius: 24,
+          spreadRadius: 0,
+        ),
+      ];
 }
 
 class RoadSafeBorders {
   RoadSafeBorders._();
 
-  static const BorderSide thin = BorderSide(
-    color: RoadSafeColors.border,
-    width: 1.0,
-  );
+  static BorderSide get thin => BorderSide(
+        color: RoadSafeColors.border,
+        width: 1.0,
+      );
 
-  static const BorderSide medium = BorderSide(
-    color: RoadSafeColors.borderStrong,
-    width: 1.5,
-  );
+  static BorderSide get medium => BorderSide(
+        color: RoadSafeColors.borderStrong,
+        width: 1.5,
+      );
 
-  static const BorderSide thick = BorderSide(
-    color: RoadSafeColors.primary,
-    width: 2.0,
-  );
+  static BorderSide get thick => BorderSide(
+        color: RoadSafeColors.primary,
+        width: 2.0,
+      );
 
-  static const BorderSide selected = BorderSide(
-    color: RoadSafeColors.primary,
-    width: 2.0,
-  );
+  static BorderSide get selected => BorderSide(
+        color: RoadSafeColors.primary,
+        width: 2.0,
+      );
 
-  static const BorderSide error = BorderSide(
-    color: RoadSafeColors.error,
-    width: 1.5,
-  );
+  static BorderSide get error => BorderSide(
+        color: RoadSafeColors.error,
+        width: 1.5,
+      );
 }

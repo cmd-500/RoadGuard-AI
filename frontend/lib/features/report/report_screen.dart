@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
 import '../../shared/models/report.dart';
 import '../../shared/providers/report_provider.dart';
 import '../../shared/providers/location_provider.dart';
-import 'issue_details_screen.dart';
+import 'camera_capture_screen.dart';
+import '../reports/issue_detail_screen.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -62,7 +64,7 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RoadSafeColors.background,
-       appBar: RoadSafeAppBar(
+      appBar: RoadSafeAppBar(
         title: 'Report Issue',
         showBackButton: true,
         actions: [
@@ -108,6 +110,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Widget _buildIssueDetailsStep() {
+    final locationProvider = context.watch<LocationProvider>();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(RoadSafeSpacing.screenPadding),
       child: Column(
@@ -121,7 +124,7 @@ class _ReportScreenState extends State<ReportScreen> {
           const SizedBox(height: RoadSafeSpacing.md),
           _buildSeveritySelector(),
           const SizedBox(height: RoadSafeSpacing.xl),
-          _buildLocationField(),
+          _buildLocationField(locationProvider),
           const SizedBox(height: RoadSafeSpacing.xl),
           _buildDetailsField(),
           const SizedBox(height: RoadSafeSpacing.xl),
@@ -145,45 +148,61 @@ class _ReportScreenState extends State<ReportScreen> {
       ('Other', HazardType.other, RoadSafeIcons.warning),
     ];
 
-    return Wrap(
-      spacing: RoadSafeSpacing.md,
-      runSpacing: RoadSafeSpacing.md,
-      children: hazardTypes.map((type) {
-        final isSelected = _selectedHazardType == type.$2;
-        return GestureDetector(
-          onTap: () => setState(() => _selectedHazardType = type.$2),
-          child: Container(
-            width: 140,
-            padding: const EdgeInsets.all(RoadSafeSpacing.md),
-            decoration: BoxDecoration(
-              color: isSelected ? RoadSafeColors.primaryContainer : RoadSafeColors.surface,
-              borderRadius: BorderRadius.circular(RoadSafeRadius.xl),
-              border: Border.all(
-                color: isSelected ? RoadSafeColors.primary : RoadSafeColors.border,
-                width: isSelected ? 2 : 1,
-              ),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  type.$3,
-                  size: 32,
-                  color: isSelected ? RoadSafeColors.primary : RoadSafeColors.textSecondary,
-                ),
-                const SizedBox(height: RoadSafeSpacing.sm),
-                Text(
-                  type.$1,
-                  style: RoadSafeTypography.labelMedium.copyWith(
-                    color: isSelected ? RoadSafeColors.primary : RoadSafeColors.textPrimary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate responsive item width based on available width
+        final availableWidth = constraints.maxWidth;
+        final crossAxisCount = availableWidth > 600 ? 4 : (availableWidth > 400 ? 3 : 2);
+        final itemWidth = (availableWidth - (RoadSafeSpacing.md * (crossAxisCount - 1))) / crossAxisCount;
+
+        return Wrap(
+          spacing: RoadSafeSpacing.md,
+          runSpacing: RoadSafeSpacing.md,
+          children: hazardTypes.map((type) {
+            final isSelected = _selectedHazardType == type.$2;
+            return SizedBox(
+              width: itemWidth,
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedHazardType = type.$2),
+                child: Container(
+                  padding: const EdgeInsets.all(RoadSafeSpacing.md),
+                  decoration: BoxDecoration(
+                    color: isSelected ? RoadSafeColors.primaryContainer : RoadSafeColors.surface,
+                    borderRadius: BorderRadius.circular(RoadSafeRadius.xl),
+                    border: Border.all(
+                      color: isSelected ? RoadSafeColors.primary : RoadSafeColors.border,
+                      width: isSelected ? 2 : 1,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        type.$3,
+                        size: 32,
+                        color: isSelected ? RoadSafeColors.primary : RoadSafeColors.textSecondary,
+                      ),
+                      const SizedBox(height: RoadSafeSpacing.sm),
+                      Flexible(
+                        child: Text(
+                          type.$1,
+                          style: RoadSafeTypography.labelMedium.copyWith(
+                            color: isSelected ? RoadSafeColors.primary : RoadSafeColors.textPrimary,
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
@@ -195,73 +214,82 @@ class _ReportScreenState extends State<ReportScreen> {
       (Severity.critical, 'Critical', 'Immediate danger', RoadSafeIcons.warningOctagon, RoadSafeColors.critical),
     ];
 
-    return Column(
-      children: severities.map((severity) {
-        final isSelected = _selectedSeverity == severity.$1;
-        return Container(
-          margin: const EdgeInsets.only(bottom: RoadSafeSpacing.sm),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => setState(() => _selectedSeverity = severity.$1),
-              borderRadius: BorderRadius.circular(RoadSafeRadius.lg),
-              child: Container(
-                padding: const EdgeInsets.all(RoadSafeSpacing.md),
-                decoration: BoxDecoration(
-                  color: isSelected ? severity.$5.withValues(alpha: 0.1) : RoadSafeColors.surface,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          children: severities.map((severity) {
+            final isSelected = _selectedSeverity == severity.$1;
+            return Container(
+              margin: const EdgeInsets.only(bottom: RoadSafeSpacing.sm),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => setState(() => _selectedSeverity = severity.$1),
                   borderRadius: BorderRadius.circular(RoadSafeRadius.lg),
-                  border: Border.all(
-                    color: isSelected ? severity.$5 : RoadSafeColors.border,
-                    width: isSelected ? 2 : 1,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(RoadSafeSpacing.md),
+                    decoration: BoxDecoration(
+                      color: isSelected ? severity.$5.withValues(alpha: 0.1) : RoadSafeColors.surface,
+                      borderRadius: BorderRadius.circular(RoadSafeRadius.lg),
+                      border: Border.all(
+                        color: isSelected ? severity.$5 : RoadSafeColors.border,
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isSelected ? severity.$5 : severity.$5.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(RoadSafeRadius.md),
+                          ),
+                          child: Icon(
+                            severity.$4,
+                            size: 20,
+                            color: isSelected ? RoadSafeColors.textOnPrimary : severity.$5,
+                          ),
+                        ),
+                        const SizedBox(width: RoadSafeSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                severity.$2,
+                                style: RoadSafeTypography.titleMedium.copyWith(
+                                  color: isSelected ? severity.$5 : RoadSafeColors.textPrimary,
+                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                ),
+                              ),
+                              Text(
+                                severity.$3,
+                                style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isSelected)
+                          Icon(RoadSafeIcons.checkCircle, size: 24, color: severity.$5),
+                      ],
+                    ),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isSelected ? severity.$5 : severity.$5.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(RoadSafeRadius.md),
-                      ),
-                      child: Icon(
-                        severity.$4,
-                        size: 20,
-                        color: isSelected ? RoadSafeColors.textOnPrimary : severity.$5,
-                      ),
-                    ),
-                    const SizedBox(width: RoadSafeSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            severity.$2,
-                            style: RoadSafeTypography.titleMedium.copyWith(
-                              color: isSelected ? severity.$5 : RoadSafeColors.textPrimary,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                            ),
-                          ),
-                          Text(
-                            severity.$3,
-                            style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (isSelected)
-                      Icon(RoadSafeIcons.checkCircle, size: 24, color: severity.$5),
-                  ],
-                ),
               ),
-            ),
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
-  Widget _buildLocationField() {
+  Widget _buildLocationField(LocationProvider locationProvider) {
+    final showError = !locationProvider.isLoading &&
+        locationProvider.error != null &&
+        _selectedLocation == null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -269,13 +297,42 @@ class _ReportScreenState extends State<ReportScreen> {
         const SizedBox(height: RoadSafeSpacing.md),
         RoadSafeTextField(
           label: 'Current Location',
-          hint: 'Auto-detected from GPS',
+          hint: locationProvider.isLoading ? 'Detecting your location…' : 'Auto-detected from GPS',
           controller: _locationController,
           readOnly: true,
           prefixIcon: RoadSafeIcons.location,
-          suffixIcon: RoadSafeIcons.gps,
-          onSuffixPressed: _loadCurrentLocation,
+          suffixIcon: locationProvider.isLoading ? null : RoadSafeIcons.gps,
+          onSuffixPressed: locationProvider.isLoading ? null : _loadCurrentLocation,
         ),
+        if (locationProvider.isLoading) ...[
+          const SizedBox(height: RoadSafeSpacing.sm),
+          Row(
+            children: [
+              const RoadSafeCircularProgress(size: 14),
+              const SizedBox(width: RoadSafeSpacing.sm),
+              Text(
+                'Fetching current location…',
+                style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
+              ),
+            ],
+          ),
+        ] else if (showError) ...[
+          const SizedBox(height: RoadSafeSpacing.sm),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(RoadSafeIcons.warningCircle, size: 16, color: RoadSafeColors.error),
+              const SizedBox(width: RoadSafeSpacing.xs),
+              Expanded(
+                child: Text(
+                  locationProvider.error!,
+                  style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.error),
+                ),
+              ),
+              RoadSafeTextButton(label: 'Retry', onPressed: _loadCurrentLocation),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -303,16 +360,23 @@ class _ReportScreenState extends State<ReportScreen> {
       children: [
         Text('When did you see this?', style: RoadSafeTypography.headlineSmall),
         const SizedBox(height: RoadSafeSpacing.md),
-        Row(
-          children: [
-            Expanded(
-              child: _buildWhenOption('Just now', 'Just now'),
-            ),
-            const SizedBox(width: RoadSafeSpacing.md),
-            Expanded(
-              child: _buildWhenOption('Earlier', 'Earlier'),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final buttonWidth = (constraints.maxWidth - RoadSafeSpacing.md) / 2;
+            return Row(
+              children: [
+                SizedBox(
+                  width: buttonWidth,
+                  child: _buildWhenOption('Just now', 'Just now'),
+                ),
+                const SizedBox(width: RoadSafeSpacing.md),
+                SizedBox(
+                  width: buttonWidth,
+                  child: _buildWhenOption('Earlier', 'Earlier'),
+                ),
+              ],
+            );
+          },
         ),
       ],
     );
@@ -348,7 +412,7 @@ class _ReportScreenState extends State<ReportScreen> {
     return RoadSafeInfoCard(
       title: 'Help keep roads safe for everyone',
       message: 'Your report will be verified by AI and the community.',
-      icon: PhosphorIconsRegular.shieldCheck,
+      icon: RoadSafeIcons.shieldCheck,
       backgroundColor: RoadSafeColors.successLight,
       borderColor: RoadSafeColors.success,
     );
@@ -394,7 +458,7 @@ class _ReportScreenState extends State<ReportScreen> {
           const SizedBox(height: RoadSafeSpacing.xl),
           RoadSafePrimaryButton(
             label: 'Submit Report',
-            leadingIcon: PhosphorIconsRegular.paperPlane,
+            leadingIcon: RoadSafeIcons.paperPlane,
             onPressed: _submitReport,
             isLoading: context.watch<ReportProvider>().isSubmitting,
           ),
@@ -427,9 +491,8 @@ class _ReportScreenState extends State<ReportScreen> {
           const SizedBox(height: RoadSafeSpacing.sm),
           RoadSafeTextButton(
             label: 'Edit',
-            leadingIcon: PhosphorIconsRegular.pencil,
+            leadingIcon: RoadSafeIcons.edit,
             onPressed: () {
-              // Navigate back to appropriate step
               if (label == 'Location') {
                 setState(() => _currentStep = 0);
                 _pageController.animateToPage(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
@@ -464,7 +527,7 @@ class _ReportScreenState extends State<ReportScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(PhosphorIconsRegular.map, size: 48, color: RoadSafeColors.textTertiary),
+                  Icon(RoadSafeIcons.mapPin, size: 48, color: RoadSafeColors.textTertiary),
                   const SizedBox(height: RoadSafeSpacing.sm),
                   Text(
                     'Map Preview\n${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}',
@@ -566,7 +629,7 @@ class _ReportScreenState extends State<ReportScreen> {
               Expanded(
                 child: RoadSafeSecondaryButton(
                   label: 'Back',
-                  leadingIcon: PhosphorIconsRegular.arrowLeft,
+                  leadingIcon: RoadSafeIcons.back,
                   onPressed: () {
                     setState(() => _currentStep--);
                     _pageController.previousPage(
@@ -580,20 +643,20 @@ class _ReportScreenState extends State<ReportScreen> {
             Expanded(
               child: RoadSafePrimaryButton(
                 label: _currentStep == 2 ? 'Submit Report' : 'Next',
-                trailingIcon: _currentStep == 2 ? null : PhosphorIconsRegular.arrowRight,
+                trailingIcon: _currentStep == 2 ? null : RoadSafeIcons.forward,
                 onPressed: _currentStep == 0
                     ? (_selectedHazardType != null && _selectedLocation != null
-                        ? () {
-                            setState(() => _currentStep++);
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        : null)
+                    ? () {
+                  setState(() => _currentStep++);
+                  _pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
+                    : null)
                     : _currentStep == 1
-                        ? null // Handled by camera screen
-                        : _submitReport,
+                    ? null // Handled by camera screen
+                    : _submitReport,
                 isLoading: _currentStep == 2 && context.watch<ReportProvider>().isSubmitting,
               ),
             ),

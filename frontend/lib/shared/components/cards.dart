@@ -136,8 +136,13 @@ class RoadSafeQuickActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return RoadSafeCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(RoadSafeSpacing.lg),
-      child: Row(
+      padding: const EdgeInsets.symmetric(
+        horizontal: RoadSafeSpacing.md,
+        vertical: RoadSafeSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             width: 48,
@@ -148,19 +153,22 @@ class RoadSafeQuickActionCard extends StatelessWidget {
             ),
             child: Icon(icon, size: 24, color: iconColor),
           ),
-          const SizedBox(width: RoadSafeSpacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: RoadSafeTypography.titleMedium),
-                const SizedBox(height: RoadSafeSpacing.xs),
-                Text(subtitle, style: RoadSafeTypography.bodySmall),
-              ],
-            ),
+          const SizedBox(height: RoadSafeSpacing.md),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: RoadSafeTypography.titleMedium,
           ),
-          if (onTap != null)
-            Icon(RoadSafeIcons.caretRight, size: 20, color: RoadSafeColors.textTertiary),
+          const SizedBox(height: RoadSafeSpacing.xs),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: RoadSafeTypography.bodySmall,
+          ),
         ],
       ),
     );
@@ -248,15 +256,22 @@ class RoadSafeHazardCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: RoadSafeSpacing.xs),
-                Row(
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: RoadSafeSpacing.md,
+                  runSpacing: RoadSafeSpacing.xs,
                   children: [
-                    Icon(RoadSafeIcons.signOut, size: 14, color: RoadSafeColors.textTertiary),
-                    const SizedBox(width: RoadSafeSpacing.xs),
-                    Text(
-                      distance,
-                      style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(RoadSafeIcons.navigation, size: 14, color: RoadSafeColors.textTertiary),
+                        const SizedBox(width: RoadSafeSpacing.xs),
+                        Text(
+                          distance,
+                          style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: RoadSafeSpacing.md),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: RoadSafeSpacing.sm,
@@ -426,9 +441,13 @@ class RoadSafeReportCard extends StatelessWidget {
                   children: [
                     _getHazardIcon(hazardType),
                     const SizedBox(width: RoadSafeSpacing.xs),
-                    Text(
-                      hazardType,
-                      style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
+                    Flexible(
+                      child: Text(
+                        hazardType,
+                        style: RoadSafeTypography.bodySmall.copyWith(color: RoadSafeColors.textSecondary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     const SizedBox(width: RoadSafeSpacing.md),
                     Icon(RoadSafeIcons.calendar, size: 14, color: RoadSafeColors.textTertiary),
@@ -666,7 +685,7 @@ class RoadSafeSafetyAlertCard extends StatelessWidget {
                       runSpacing: RoadSafeSpacing.xs,
                       children: [
                         _buildInfoChip(RoadSafeIcons.mapPin, location),
-                        _buildInfoChip(RoadSafeIcons.signOut, distance),
+                        _buildInfoChip(RoadSafeIcons.navigation, distance),
                         _buildSeverityChip(severity),
                       ],
                     ),
@@ -831,15 +850,15 @@ class RoadSafeStatusTimeline extends StatelessWidget {
                   child: isCompleted
                       ? Icon(RoadSafeIcons.check, size: 14, color: RoadSafeColors.textOnPrimary)
                       : (isCurrent
-                          ? Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: RoadSafeColors.textOnPrimary,
-                                borderRadius: BorderRadius.circular(RoadSafeRadius.round),
-                              ),
-                            )
-                          : null),
+                      ? Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: RoadSafeColors.textOnPrimary,
+                      borderRadius: BorderRadius.circular(RoadSafeRadius.round),
+                    ),
+                  )
+                      : null),
                 ),
                 if (!isLast)
                   Expanded(
@@ -859,13 +878,17 @@ class RoadSafeStatusTimeline extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          item.title,
-                          style: RoadSafeTypography.titleMedium.copyWith(
-                            color: isCurrent || isCompleted
-                                ? RoadSafeColors.textPrimary
-                                : RoadSafeColors.textSecondary,
-                            fontWeight: isCurrent || isCompleted ? FontWeight.w600 : FontWeight.w400,
+                        Flexible(
+                          child: Text(
+                            item.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: RoadSafeTypography.titleMedium.copyWith(
+                              color: isCurrent || isCompleted
+                                  ? RoadSafeColors.textPrimary
+                                  : RoadSafeColors.textSecondary,
+                              fontWeight: isCurrent || isCompleted ? FontWeight.w600 : FontWeight.w400,
+                            ),
                           ),
                         ),
                         if (isCurrent) ...[

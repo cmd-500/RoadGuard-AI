@@ -1,3 +1,5 @@
+import 'report.dart';
+
 enum VoteType { upvote, downvote }
 
 class Vote {
@@ -65,7 +67,7 @@ class VoteStatus {
       voteScore: json['voteScore'] ?? 0,
       upvoteCount: json['upvoteCount'] ?? 0,
       downvoteCount: json['downvoteCount'] ?? 0,
-      communityStatus: Report._parseCommunityStatus(json['communityStatus']),
+      communityStatus: Report.parseCommunityStatus(json['communityStatus']),
       userVote: json['userVote'] != null
           ? (json['userVote'] == 'UPVOTE' ? VoteType.upvote : VoteType.downvote)
           : null,

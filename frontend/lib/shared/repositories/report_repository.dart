@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import '../services/api_client.dart';
-import '../../models/report.dart';
+import '../models/report.dart';
 
 abstract class ReportRepository {
   Future<Report> createReport({

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
@@ -32,7 +31,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
   @override
   Widget build(BuildContext context) {
     final reportProvider = context.watch<ReportProvider>();
-    final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
       backgroundColor: RoadSafeColors.background,
@@ -40,7 +38,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         title: 'My Reports',
         actions: [
           IconButton(
-            icon: Icon(PhosphorIconsRegular.magnifyingGlass, size: 24),
+            icon: Icon(RoadSafeIcons.search, size: 24),
             onPressed: () {},
             padding: const EdgeInsets.only(right: RoadSafeSpacing.screenPadding),
           ),
@@ -139,7 +137,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(PhosphorIconsRegular.folderOpen, size: 64, color: RoadSafeColors.textTertiary),
+            Icon(RoadSafeIcons.folderOpen, size: 64, color: RoadSafeColors.textTertiary),
             const SizedBox(height: RoadSafeSpacing.lg),
             Text(
               'No reports yet',
@@ -153,7 +151,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             const SizedBox(height: RoadSafeSpacing.xl),
             RoadSafePrimaryButton(
               label: 'Report Issue',
-              leadingIcon: PhosphorIconsRegular.plus,
+              leadingIcon: RoadSafeIcons.plus,
               isFullWidth: false,
               onPressed: () {},
             ),

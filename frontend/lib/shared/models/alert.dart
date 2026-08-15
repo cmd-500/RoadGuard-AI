@@ -7,6 +7,25 @@ enum AlertCategory {
   emergency,
 }
 
+extension AlertCategoryExtension on AlertCategory {
+  String get categoryDisplay {
+    switch (this) {
+      case AlertCategory.all:
+        return 'All Alerts';
+      case AlertCategory.road:
+        return 'Road';
+      case AlertCategory.weather:
+        return 'Weather';
+      case AlertCategory.disaster:
+        return 'Disaster';
+      case AlertCategory.visibility:
+        return 'Visibility';
+      case AlertCategory.emergency:
+        return 'Emergency';
+    }
+  }
+}
+
 enum AlertSeverity {
   critical,
   high,
@@ -56,23 +75,6 @@ class SafetyAlert {
         return 'LOW';
       case AlertSeverity.informational:
         return 'INFO';
-    }
-  }
-
-  String get categoryDisplay {
-    switch (category) {
-      case AlertCategory.all:
-        return 'All Alerts';
-      case AlertCategory.road:
-        return 'Road';
-      case AlertCategory.weather:
-        return 'Weather';
-      case AlertCategory.disaster:
-        return 'Disaster';
-      case AlertCategory.visibility:
-        return 'Visibility';
-      case AlertCategory.emergency:
-        return 'Emergency';
     }
   }
 

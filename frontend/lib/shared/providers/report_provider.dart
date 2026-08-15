@@ -1,6 +1,7 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
-import '../../repositories/report_repository.dart';
-import '../../models/report.dart';
+import '../models/report.dart';
+import '../repositories/report_repository.dart';
 
 class ReportProvider extends ChangeNotifier {
   final ReportRepository _repository;

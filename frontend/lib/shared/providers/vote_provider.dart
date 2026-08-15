@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../../repositories/vote_repository.dart';
-import '../../models/vote.dart';
-import '../../models/report.dart';
+import '../models/vote.dart';
+import '../models/report.dart';
+import '../repositories/vote_repository.dart';
 
 class VoteProvider extends ChangeNotifier {
   final VoteRepository _repository;
