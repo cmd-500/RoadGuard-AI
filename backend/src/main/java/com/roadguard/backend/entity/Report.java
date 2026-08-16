@@ -2,8 +2,8 @@ package com.roadguard.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
@@ -11,13 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "reports", indexes = {
-    @Index(name = "idx_report_location", columnList = "location"),
-    @Index(name = "idx_report_status", columnList = "status"),
-    @Index(name = "idx_report_hazard_type", columnList = "hazard_type"),
-    @Index(name = "idx_report_created_by", columnList = "created_by"),
-    @Index(name = "idx_report_community_status", columnList = "community_status")
-})
+@Table(name = "reports")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,15 +21,16 @@ public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String address;
 
     @Enumerated(EnumType.STRING)
@@ -46,21 +41,21 @@ public class Report {
     @Column(nullable = false)
     private Severity severity;
 
-    @Column(name = "location", nullable = false, columnDefinition = "geometry(Point, 4326)")
+    @Column(
+            name = "location",
+            nullable = false,
+            columnDefinition = "geometry(Point, 4326)"
+    )
     private Point location;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url", nullable = false, length = 500)
     private String imageUrl;
 
-    @Column(name = "image_public_id", nullable = false)
+    @Column(name = "image_public_id", nullable = false, length = 255)
     private String imagePublicId;
 
-    @Embedded
-    @Builder.Default
-    private Verification verification = new Verification();
-
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "report_status", nullable = false)
     @Builder.Default
     private Status status = Status.PENDING;
 
@@ -82,59 +77,102 @@ public class Report {
     private Integer downvoteCount = 0;
 
     @Column(name = "created_by", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String createdBy;
 
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    @Column(name = "updated_at", nullable = false)
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Embedded
+    @Builder.Default
+    private Verification verification = new Verification();
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     public enum HazardType {
-        POTHOLE, UNMARKED_BREAKER, ILLEGAL_BREAKER, WATERLOGGED_HAZARD, OTHER
+        POTHOLE,
+        UNMARKED_BREAKER,
+        ILLEGAL_BREAKER,
+        WATERLOGGED_HAZARD,
+        OTHER
     }
 
     public enum Severity {
-        LOW, MEDIUM, HIGH, CRITICAL
+        LOW,
+        MEDIUM,
+        HIGH,
+        CRITICAL
     }
 
     public enum Status {
-        PENDING, IN_PROGRESS, RESOLVED, REJECTED
+        PENDING,
+        IN_PROGRESS,
+        RESOLVED,
+        REJECTED
     }
 
     public enum CommunityStatus {
-        UNVERIFIED, CONFIRMED, DISPUTED
+        UNVERIFIED,
+        CONFIRMED,
+        DISPUTED
     }
 
+    @Embeddable
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Embeddable
     public static class Verification {
+
         @Enumerated(EnumType.STRING)
+        @Column(name = "verification_status")
         @Builder.Default
         private VerificationStatus status = VerificationStatus.PASSED;
 
         @ElementCollection
-        @CollectionTable(name = "verification_reasons", joinColumns = @JoinColumn(name = "report_id"))
+        @CollectionTable(
+                name = "verification_reasons",
+                joinColumns = @JoinColumn(name = "report_id")
+        )
         @Column(name = "reason")
         @Builder.Default
         private List<String> reasons = new ArrayList<>();
 
+        @Column(name = "verification_blur_score")
         private Double blurScore;
+
+        @Column(name = "verification_is_blurry")
         private Boolean isBlurry;
+
+        @Column(name = "verification_image_hash")
         private String imageHash;
+
+        @Column(name = "verification_gps_match")
         private Boolean gpsMatch;
+
+        @Column(name = "verification_gps_distance_meters")
         private Double gpsDistanceMeters;
+
+        @Column(name = "verification_duplicate_of_report")
+        @JdbcTypeCode(SqlTypes.UUID)
         private String duplicateOfReport;
+
+        @Column(name = "verification_trust_effect_applied")
         @Builder.Default
         private Boolean trustEffectApplied = false;
 
         public enum VerificationStatus {
-            PASSED, FLAGGED
+            PASSED,
+            FLAGGED
         }
     }
 }

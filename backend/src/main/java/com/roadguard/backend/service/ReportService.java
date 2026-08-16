@@ -145,7 +145,7 @@ public class ReportService {
     }
 
     public List<ReportDtos.NearbyReportResponse> getNearbyReports(double latitude, double longitude, double radiusMeters) {
-        List<Report> reports = reportRepository.findNearbyReports(Report.Status.REJECTED, latitude, longitude, radiusMeters);
+        List<Report> reports = reportRepository.findNearbyReports(Report.Status.REJECTED.name(), latitude, longitude, radiusMeters);
         return reports.stream().map(this::mapToNearbyResponse).collect(Collectors.toList());
     }
 
@@ -155,7 +155,7 @@ public class ReportService {
         }
 
         String polylineWKT = buildLineStringWKT(waypoints);
-        List<Report> reports = reportRepository.findReportsOnRoute(Report.Status.REJECTED, polylineWKT, bufferMeters);
+        List<Report> reports = reportRepository.findReportsOnRoute(Report.Status.REJECTED.name(), polylineWKT, bufferMeters);
 
         return reports.stream().map(report -> {
             double distanceToRoute = calculateDistanceToRoute(report, waypoints);

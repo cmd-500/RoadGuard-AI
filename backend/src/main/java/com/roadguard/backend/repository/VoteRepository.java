@@ -16,13 +16,13 @@ public interface VoteRepository extends JpaRepository<Vote, String> {
 
     List<Vote> findByReportId(String reportId);
 
-    @Query("SELECT COUNT(v) FROM Vote v WHERE v.reportId = :reportId AND v.voteType = com.roadguard.backend.entity.Vote.VoteType.UPVOTE")
+    @Query("SELECT COUNT(v) FROM Vote v WHERE v.reportId = :reportId AND v.voteType = 'UPVOTE'")
     long countUpvotesByReportId(@Param("reportId") String reportId);
 
-    @Query("SELECT COUNT(v) FROM Vote v WHERE v.reportId = :reportId AND v.voteType = com.roadguard.backend.entity.Vote.VoteType.DOWNVOTE")
+    @Query("SELECT COUNT(v) FROM Vote v WHERE v.reportId = :reportId AND v.voteType = 'DOWNVOTE'")
     long countDownvotesByReportId(@Param("reportId") String reportId);
 
-    @Query("SELECT SUM(CASE WHEN v.voteType = com.roadguard.backend.entity.Vote.VoteType.UPVOTE THEN v.weight ELSE -v.weight END) FROM Vote v WHERE v.reportId = :reportId")
+    @Query("SELECT SUM(CASE WHEN v.voteType = 'UPVOTE' THEN v.weight ELSE -v.weight END) FROM Vote v WHERE v.reportId = :reportId")
     Integer getVoteScoreByReportId(@Param("reportId") String reportId);
 
     boolean existsByReportIdAndUserId(String reportId, String userId);

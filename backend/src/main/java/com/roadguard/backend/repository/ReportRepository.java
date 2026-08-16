@@ -20,36 +20,36 @@ public interface ReportRepository extends JpaRepository<Report, String> {
 
     Page<Report> findByHazardTypeAndStatusNot(Report.HazardType hazardType, Report.Status status, Pageable pageable);
 
-    @Query("""
-        SELECT r FROM Report r
-        WHERE r.status != :rejectedStatus
+    @Query(value = """
+        SELECT * FROM reports r
+        WHERE r.report_status != :rejectedStatus
         AND ST_DWithin(r.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radiusMeters)
         ORDER BY ST_Distance(r.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography)
-        """)
+        """, nativeQuery = true)
     List<Report> findNearbyReports(
-            @Param("rejectedStatus") Report.Status rejectedStatus,
+            @Param("rejectedStatus") String rejectedStatus,
             @Param("lat") double lat,
             @Param("lng") double lng,
             @Param("radiusMeters") double radiusMeters
     );
 
-    @Query("""
-        SELECT r FROM Report r
-        WHERE r.status != :rejectedStatus
+    @Query(value = """
+        SELECT * FROM reports r
+        WHERE r.report_status != :rejectedStatus
         AND ST_Within(r.location, ST_Buffer(ST_GeomFromText(:polylineWKT, 4326)::geography, :bufferMeters)::geometry)
-        """)
+        """, nativeQuery = true)
     List<Report> findReportsOnRoute(
-            @Param("rejectedStatus") Report.Status rejectedStatus,
+            @Param("rejectedStatus") String rejectedStatus,
             @Param("polylineWKT") String polylineWKT,
             @Param("bufferMeters") double bufferMeters
     );
 
-    @Query("""
-        SELECT r FROM Report r
-        WHERE r.createdAt >= :since
-        AND r.verification.imageHash IS NOT NULL
+    @Query(value = """
+        SELECT * FROM reports r
+        WHERE r.created_at >= :since
+        AND r.verification_image_hash IS NOT NULL
         AND ST_DWithin(r.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radiusMeters)
-        """)
+        """, nativeQuery = true)
     List<Report> findPotentialDuplicates(
             @Param("since") LocalDateTime since,
             @Param("lat") double lat,
@@ -58,6 +58,4 @@ public interface ReportRepository extends JpaRepository<Report, String> {
     );
 
     List<Report> findByCreatedBy(String userId);
-
-    Optional<Report> findByIdWithCreator(String id);
 }

@@ -3,6 +3,8 @@ package com.roadguard.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -22,12 +24,15 @@ public class Vote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String id;
 
     @Column(name = "report_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String reportId;
 
     @Column(name = "user_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String userId;
 
     @Enumerated(EnumType.STRING)

@@ -2,7 +2,7 @@ package com.roadguard.backend.util;
 
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.common.IImageMetadata;
+import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffField;
@@ -124,7 +124,7 @@ public class ImageVerificationUtil {
         }
     }
 
-    private int hammingDistance(String hash1, String hash2) {
+    public int hammingDistance(String hash1, String hash2) {
         if (hash1.length() != hash2.length()) return Integer.MAX_VALUE;
         int distance = 0;
         for (int i = 0; i < hash1.length(); i++) {
@@ -134,8 +134,8 @@ public class ImageVerificationUtil {
     }
 
     public ExifGps extractExifGps(byte[] imageBytes) {
-        try (InputStream is = new ByteArrayInputStream(imageBytes)) {
-            IImageMetadata metadata = Imaging.getMetadata(is);
+        try {
+            ImageMetadata metadata = Imaging.getMetadata(imageBytes);
             if (metadata instanceof JpegImageMetadata jpegMetadata) {
                 TiffImageMetadata exif = jpegMetadata.getExif();
                 if (exif != null) {
@@ -161,7 +161,7 @@ public class ImageVerificationUtil {
         return null;
     }
 
-    private double convertToDegrees(TiffField field) {
+    private double convertToDegrees(TiffField field) throws ImageReadException {
         Object val = field.getValue();
         if (val instanceof Number[]) {
             Number[] parts = (Number[]) val;
