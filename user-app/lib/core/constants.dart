@@ -1,6 +1,6 @@
 class ApiConfig {
   // android emulator -> host machine is 10.0.2.2, physical device -> your PC's LAN IP
-  static const String baseUrl = 'http://10.0.2.2:5000/api/v1';
+  static const String baseUrl = 'http://10.0.2.2:8080/api/v1';
 }
 
 class HazardType {

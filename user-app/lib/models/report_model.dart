@@ -64,25 +64,43 @@ class ReportModel {
   });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
-    final coords = json['location']['coordinates'] as List;
+    // Backend returns location as GeoJSON Point with coordinates [lng, lat]
+    double latitude, longitude;
+    if (json['location'] is Map && json['location']['coordinates'] is List) {
+      final coords = json['location']['coordinates'] as List;
+      longitude = (coords[0] as num).toDouble();
+      latitude = (coords[1] as num).toDouble();
+    } else if (json['latitude'] != null && json['longitude'] != null) {
+      // Fallback for direct lat/lng fields
+      latitude = (json['latitude'] as num).toDouble();
+      longitude = (json['longitude'] as num).toDouble();
+    } else {
+      latitude = 0;
+      longitude = 0;
+    }
+
+    // Handle both old and new field names for status
+    final status = json['report_status'] ?? json['status'] ?? 'PENDING';
+    final communityStatus = json['community_status'] ?? json['communityStatus'] ?? 'UNVERIFIED';
+
     return ReportModel(
-      id: json['_id'],
-      title: json['title'],
-      description: json['description'],
-      address: json['address'],
-      hazardType: json['hazardType'],
-      severity: json['severity'],
-      longitude: (coords[0] as num).toDouble(),
-      latitude: (coords[1] as num).toDouble(),
-      imageUrl: json['imageUrl'],
-      status: json['status'],
-      communityStatus: json['communityStatus'],
-      voteScore: json['voteScore'] ?? 0,
-      upvoteCount: json['upvoteCount'] ?? 0,
-      downvoteCount: json['downvoteCount'] ?? 0,
+      id: json['id']?.toString() ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      address: json['address'] ?? '',
+      hazardType: json['hazard_type'] ?? json['hazardType'] ?? 'OTHER',
+      severity: json['severity'] ?? 'LOW',
+      longitude: longitude,
+      latitude: latitude,
+      imageUrl: json['image_url'] ?? json['imageUrl'] ?? '',
+      status: status,
+      communityStatus: communityStatus,
+      voteScore: (json['vote_score'] ?? json['voteScore'] ?? 0) as int,
+      upvoteCount: (json['upvote_count'] ?? json['upvoteCount'] ?? 0) as int,
+      downvoteCount: (json['downvote_count'] ?? json['downvoteCount'] ?? 0) as int,
       verification: ReportVerification.fromJson(json['verification'] ?? {}),
       createdBy: json['createdBy'] is Map ? UserModel.fromJson(json['createdBy']) : null,
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: DateTime.tryParse(json['created_at'] ?? json['createdAt'] ?? '') ?? DateTime.now(),
     );
   }
 

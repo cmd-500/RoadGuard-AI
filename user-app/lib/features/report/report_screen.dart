@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -6,8 +7,8 @@ import '../../shared/components/index.dart';
 import '../../shared/models/report.dart';
 import '../../shared/providers/report_provider.dart';
 import '../../shared/providers/location_provider.dart';
+import '../../services/report_service.dart';
 import 'camera_capture_screen.dart';
-import '../reports/issue_detail_screen.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -27,6 +28,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   final TextEditingController _detailsController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   Position? _selectedLocation;
+  String? _capturedImagePath;
 
   @override
   void initState() {
@@ -439,6 +441,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   Widget _buildAddPhotoStep() {
     return CameraCaptureScreen(
       onPhotoCaptured: (imagePath) {
+        setState(() => _capturedImagePath = imagePath);
         // Navigate to review step
         setState(() => _currentStep = 2);
         _pageController.animateToPage(
@@ -584,26 +587,53 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
       return;
     }
 
-    final success = await context.read<ReportProvider>().createReport(
-      title: _selectedHazardType!.name.replaceAll('_', ' ').toUpperCase(),
-      description: _detailsController.text,
-      address: _locationController.text,
-      hazardType: _selectedHazardType!,
-      severity: _selectedSeverity,
-      latitude: _selectedLocation!.latitude,
-      longitude: _selectedLocation!.longitude,
-      imagePath: '', // Will be handled by camera screen
-    );
-
-    if (success != null && mounted) {
+    // Get the captured image from the camera screen
+    final imageFile = _getCapturedImage();
+    if (imageFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Report submitted successfully!', style: AppTypography.bodyMedium),
-          backgroundColor: AppColors.success,
+          content: Text('Please capture a photo', style: AppTypography.bodyMedium),
+          backgroundColor: AppColors.error,
         ),
       );
-      _resetForm();
+      return;
     }
+
+    try {
+      final created = await ReportService.createReport(
+        title: _selectedHazardType!.name.replaceAll('_', ' ').toUpperCase(),
+        description: _detailsController.text,
+        address: _locationController.text,
+        hazardType: _selectedHazardType!.name,
+        severity: _selectedSeverity.name,
+        latitude: _selectedLocation!.latitude,
+        longitude: _selectedLocation!.longitude,
+        imageFile: File(imageFile!),
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Report submitted successfully!', style: AppTypography.bodyMedium),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        _resetForm();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit report: $e', style: AppTypography.bodyMedium),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  String? _getCapturedImage() {
+    return _capturedImagePath;
   }
 
   void _resetForm() {

@@ -26,7 +26,7 @@ class ReportService {
     });
 
     final res = await ApiClient.instance.post('/reports', data: formData);
-    return ReportModel.fromJson(res.data['data']);
+    return ReportModel.fromJson(res.data['data'] ?? res.data);
   }
 
   static Future<List<ReportModel>> getReports({String? status, String? hazardType}) async {
@@ -34,7 +34,8 @@ class ReportService {
       if (status != null) 'status': status,
       if (hazardType != null) 'hazardType': hazardType,
     });
-    return (res.data['data'] as List).map((e) => ReportModel.fromJson(e)).toList();
+    final data = res.data['data'] ?? res.data['reports'] ?? res.data;
+    return (data as List).map((e) => ReportModel.fromJson(e)).toList();
   }
 
   static Future<List<ReportModel>> getNearby(double latitude, double longitude, {int? radiusMeters}) async {
@@ -43,24 +44,26 @@ class ReportService {
       'longitude': longitude,
       if (radiusMeters != null) 'radiusMeters': radiusMeters,
     });
-    return (res.data['data'] as List).map((e) => ReportModel.fromJson(e)).toList();
+    final data = res.data['data'] ?? res.data['reports'] ?? res.data;
+    return (data as List).map((e) => ReportModel.fromJson(e)).toList();
   }
 
   static Future<ReportModel> castVote(String reportId, String voteType) async {
     final res = await ApiClient.instance.post('/reports/$reportId/vote', data: {'voteType': voteType});
-    return ReportModel.fromJson(res.data['data']);
+    return ReportModel.fromJson(res.data['data'] ?? res.data);
   }
 
   static Future<ReportModel> updateStatus(String reportId, String status) async {
     final res = await ApiClient.instance.patch('/reports/$reportId/status', data: {'status': status});
-    return ReportModel.fromJson(res.data['data']);
+    return ReportModel.fromJson(res.data['data'] ?? res.data);
   }
 
   static Future<List<ReportModel>> checkRoute(List<Map<String, double>> waypoints, {int? bufferMeters}) async {
-    final res = await ApiClient.instance.post('/routes/check', data: {
+    final res = await ApiClient.instance.post('/reports/check-route', data: {
       'waypoints': waypoints,
       if (bufferMeters != null) 'bufferMeters': bufferMeters,
     });
-    return (res.data['data'] as List).map((e) => ReportModel.fromRouteCheckJson(e)).toList();
+    final data = res.data['data'] ?? res.data['reports'] ?? res.data;
+    return (data as List).map((e) => ReportModel.fromRouteCheckJson(e)).toList();
   }
 }

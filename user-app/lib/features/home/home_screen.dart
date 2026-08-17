@@ -4,7 +4,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
-import '../../shared/models/report.dart';
+import '../../shared/models/report.dart' as shared_models;
+import '../../shared/models/report.dart' show Severity;
 import '../../shared/providers/report_provider.dart';
 import '../../shared/providers/location_provider.dart';
 import '../../shared/providers/auth_provider.dart';
@@ -309,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 boxShadow: AppShadows.card,
               ),
               child: Icon(
-                _getHazardIcon(report.hazardType),
+                _getHazardIcon(report.hazardType.name),
                 size: 14,
                 color: AppColors.onPrimary,
               ),
@@ -322,37 +323,37 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return markers;
   }
 
-  IconData _getHazardIcon(HazardType type) {
-    switch (type) {
-      case HazardType.pothole:
+  IconData _getHazardIcon(String hazardType) {
+    switch (hazardType) {
+      case 'POTHOLE':
         return AppIcons.pothole;
-      case HazardType.accident:
+      case 'ACCIDENT':
         return AppIcons.carCrash;
-      case HazardType.fog:
+      case 'FOG':
         return AppIcons.cloudFog;
-      case HazardType.speedBreaker:
-      case HazardType.unmarkedBreaker:
-      case HazardType.illegalBreaker:
+      case 'SPEED_BREAKER':
+      case 'UNMARKED_BREAKER':
+      case 'ILLEGAL_BREAKER':
         return AppIcons.speedBump;
-      case HazardType.waterlogging:
-      case HazardType.waterloggedHazard:
+      case 'WATERLOGGING':
+      case 'WATERLOGGED_HAZARD':
         return AppIcons.waves;
-      case HazardType.roadDamage:
+      case 'ROAD_DAMAGE':
         return AppIcons.roadHorizon;
-      case HazardType.construction:
+      case 'CONSTRUCTION':
         return AppIcons.hammer;
-      case HazardType.emergency:
+      case 'EMERGENCY':
         return AppIcons.warningCircle;
       default:
         return AppIcons.warning;
     }
   }
 
-  void _showQuickHazardInfo(NearbyReport report) {
+  void _showQuickHazardInfo(shared_models.NearbyReport report) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${report.hazardType.name.replaceAll('_', ' ').toUpperCase()} - ${(report.distanceMeters / 1000).toStringAsFixed(1)} km',
+          '${report.hazardType.name.toUpperCase()} - ${(report.distanceMeters / 1000).toStringAsFixed(1)} km',
           style: AppTypography.bodyMedium,
         ),
         backgroundColor: AppColors.hazardColor(report.hazardType.name),
@@ -389,14 +390,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               onTap: () => _changeTab(AppTab.alerts),
             ),
             AppQuickActionCard(
-              title: 'Report Issue',
-              subtitle: 'Help others',
-              icon: AppIcons.report,
-              iconBackgroundColor: AppColors.primaryContainer,
-              iconColor: AppColors.primary,
-              onTap: () => _changeTab(AppTab.report),
-            ),
-            AppQuickActionCard(
               title: 'Plan Your Trip',
               subtitle: 'Safe route',
               icon: AppIcons.map,
@@ -411,6 +404,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               iconBackgroundColor: AppColors.warningLight,
               iconColor: AppColors.warning,
               onTap: () {},
+            ),
+            AppQuickActionCard(
+              title: 'My Reports',
+              subtitle: 'View history',
+              icon: AppIcons.flag,
+              iconBackgroundColor: AppColors.primaryContainer,
+              iconColor: AppColors.primary,
+              onTap: () => _changeTab(AppTab.profile),
             ),
           ],
         ),
@@ -451,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         title: report.title,
                         distance: '${(report.distanceMeters / 1000).toStringAsFixed(1)} km',
                         location: report.creator?.name ?? 'Unknown location',
-                        severity: _getRiskLevel(report.severity),
+                        severity: _getRiskLevel(report.severity.name),
                         imageUrl: report.imageUrl,
                         onTap: () {},
                       ),
@@ -483,15 +484,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  String _getRiskLevel(Severity severity) {
-    switch (severity) {
-      case Severity.critical:
+  String _getRiskLevel(String severity) {
+    switch (severity.toUpperCase()) {
+      case 'CRITICAL':
         return 'HIGH RISK';
-      case Severity.high:
+      case 'HIGH':
         return 'HIGH RISK';
-      case Severity.medium:
+      case 'MEDIUM':
         return 'MEDIUM RISK';
-      case Severity.low:
+      case 'LOW':
+        return 'LOW RISK';
+      default:
         return 'LOW RISK';
     }
   }
