@@ -1,6 +1,9 @@
 class ApiConfig {
-  // android emulator -> host machine is 10.0.2.2, physical device -> your PC's LAN IP
-  static const String baseUrl = 'http://10.0.2.2:8080/api/v1';
+  // Use dart-define for web (localhost), default to Android emulator IP
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.0.2.2:8080/api/v1',
+  );
 }
 
 class HazardType {

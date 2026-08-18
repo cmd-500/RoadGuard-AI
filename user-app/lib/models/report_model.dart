@@ -27,7 +27,7 @@ class ReportModel {
   final String severity;
   final double latitude;
   final double longitude;
-  final String imageUrl;
+  final String? imageUrl;
   final String status;
   final String communityStatus;
   final int voteScore;
@@ -50,7 +50,7 @@ class ReportModel {
     required this.severity,
     required this.latitude,
     required this.longitude,
-    required this.imageUrl,
+    this.imageUrl,
     required this.status,
     required this.communityStatus,
     required this.voteScore,

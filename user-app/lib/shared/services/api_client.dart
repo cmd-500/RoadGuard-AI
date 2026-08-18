@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -132,7 +133,10 @@ class ApiClient {
     required MultipartFile image,
   }) {
     final formData = FormData.fromMap({
-      'data': data,
+      'data': MultipartFile.fromString(
+        jsonEncode(data),
+        contentType: DioMediaType('application', 'json'),
+      ),
       'image': image,
     });
     return _dio.post('/reports', data: formData).then((r) => r.data);

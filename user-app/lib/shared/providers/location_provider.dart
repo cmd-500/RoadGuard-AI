@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -17,7 +18,7 @@ class LocationProvider extends ChangeNotifier {
 
   Future<void> requestPermission() async {
     _isLoading = true;
-    notifyListeners();
+    _safeNotify();
 
     _permissionStatus = await Geolocator.checkPermission();
     if (_permissionStatus == LocationPermission.denied) {
@@ -25,7 +26,7 @@ class LocationProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    notifyListeners();
+    _safeNotify();
   }
 
   Future<void> getCurrentLocation() async {
@@ -35,13 +36,13 @@ class LocationProvider extends ChangeNotifier {
       if (_permissionStatus == LocationPermission.denied ||
           _permissionStatus == LocationPermission.deniedForever) {
         _error = 'Location permission denied';
-        notifyListeners();
+        _safeNotify();
         return;
       }
     }
 
     _isLoading = true;
-    notifyListeners();
+    _safeNotify();
 
     try {
       _currentPosition = await Geolocator.getCurrentPosition(
@@ -55,8 +56,17 @@ class LocationProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    notifyListeners();
+    _safeNotify();
   }
+
+  void _safeNotify() {
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) notifyListeners();
+    });
+  }
+
+  bool get mounted => true; // Override in tests if needed
 
   Future<String> _getAddressFromPosition(Position position) async {
     try {

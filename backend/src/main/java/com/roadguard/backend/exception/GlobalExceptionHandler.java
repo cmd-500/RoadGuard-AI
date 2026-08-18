@@ -53,6 +53,12 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("FORBIDDEN", "Access denied"));
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.support.MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingPart(org.springframework.web.multipart.support.MissingServletRequestPartException ex) {
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse("MISSING_PART", "Required part '" + ex.getRequestPartName() + "' is not present."));
+    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(413)

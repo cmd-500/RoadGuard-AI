@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   final TextEditingController _detailsController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   Position? _selectedLocation;
-  String? _capturedImagePath;
+  Uint8List? _capturedImageBytes;
 
   @override
   void initState() {
@@ -323,6 +324,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
           prefixIcon: AppIcons.location,
           suffixIcon: locationProvider.isLoading ? null : AppIcons.gps,
           onSuffixPressed: locationProvider.isLoading ? null : _loadCurrentLocation,
+          fillColor: AppColors.surfaceContainerLow,
         ),
         if (locationProvider.isLoading) ...[
           const SizedBox(height: AppSpacing.sm),
@@ -368,6 +370,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
           controller: _detailsController,
           maxLines: 4,
           maxLength: 200,
+          fillColor: AppColors.surfaceContainerLow,
         ),
       ],
     );
@@ -440,8 +443,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
 
   Widget _buildAddPhotoStep() {
     return CameraCaptureScreen(
-      onPhotoCaptured: (imagePath) {
-        setState(() => _capturedImagePath = imagePath);
+      onPhotoCaptured: (imageBytes, imageName) {
+        setState(() => _capturedImageBytes = imageBytes);
         // Navigate to review step
         setState(() => _currentStep = 2);
         _pageController.animateToPage(
@@ -587,9 +590,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
       return;
     }
 
-    // Get the captured image from the camera screen
-    final imageFile = _getCapturedImage();
-    if (imageFile == null) {
+    final imageBytes = _capturedImageBytes;
+    if (imageBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please capture a photo', style: AppTypography.bodyMedium),
@@ -608,7 +610,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
         severity: _selectedSeverity.name,
         latitude: _selectedLocation!.latitude,
         longitude: _selectedLocation!.longitude,
-        imageFile: File(imageFile!),
+        imageFile: imageBytes,
+        imageName: 'report_${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
 
       if (mounted) {
@@ -632,8 +635,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
     }
   }
 
-  String? _getCapturedImage() {
-    return _capturedImagePath;
+  Uint8List? _getCapturedImage() {
+    return _capturedImageBytes;
   }
 
   void _resetForm() {
@@ -644,6 +647,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
       _selectedWhen = 'Just now';
       _detailsController.clear();
       _selectedLocation = null;
+      _capturedImageBytes = null;
     });
     _pageController.animateToPage(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }

@@ -218,6 +218,7 @@ class AppTextArea extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final bool enabled;
   final FocusNode? focusNode;
+  final Color? fillColor;
 
   const AppTextArea({
     super.key,
@@ -232,6 +233,7 @@ class AppTextArea extends StatelessWidget {
     this.validator,
     this.enabled = true,
     this.focusNode,
+    this.fillColor,
   });
 
   @override
@@ -250,6 +252,7 @@ class AppTextArea extends StatelessWidget {
       focusNode: focusNode,
       textCapitalization: TextCapitalization.sentences,
       keyboardType: TextInputType.multiline,
+      fillColor: fillColor,
     );
   }
 }

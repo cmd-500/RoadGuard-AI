@@ -119,7 +119,9 @@ public class ReportService {
                 .build();
 
         reportRepository.save(report);
-        userRepository.incrementReportsSubmitted(userId);
+        if (userId != null) {
+            userRepository.incrementReportsSubmitted(userId);
+        }
 
         notificationService.broadcastNewReport(mapToResponse(report));
 
@@ -181,7 +183,7 @@ public class ReportService {
     }
 
     private ReportDtos.Response mapToResponse(Report report) {
-        User creator = userRepository.findById(report.getCreatedBy()).orElse(null);
+        User creator = report.getCreatedBy() != null ? userRepository.findById(report.getCreatedBy()).orElse(null) : null;
 
         return ReportDtos.Response.builder()
                 .id(report.getId())
@@ -211,7 +213,7 @@ public class ReportService {
     }
 
     private ReportDtos.NearbyReportResponse mapToNearbyResponse(Report report) {
-        User creator = userRepository.findById(report.getCreatedBy()).orElse(null);
+        User creator = report.getCreatedBy() != null ? userRepository.findById(report.getCreatedBy()).orElse(null) : null;
 
         return ReportDtos.NearbyReportResponse.builder()
                 .id(report.getId())
@@ -345,7 +347,7 @@ public class ReportService {
 
         double a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
                 Math.cos(phi1) * Math.cos(phi2) *
-                Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+                        Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }

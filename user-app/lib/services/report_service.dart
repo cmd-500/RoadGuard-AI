@@ -1,5 +1,7 @@
-import 'dart:io';
+import 'dart:io' show File;
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../models/report_model.dart';
 import 'api_client.dart';
 
@@ -12,7 +14,8 @@ class ReportService {
     required String severity,
     required double latitude,
     required double longitude,
-    required File imageFile,
+    required dynamic imageFile, // File on mobile, Uint8List on web
+    String? imageName,
   }) async {
     final formData = FormData.fromMap({
       'title': title,
@@ -22,7 +25,12 @@ class ReportService {
       'severity': severity,
       'latitude': latitude,
       'longitude': longitude,
-      'image': await MultipartFile.fromFile(imageFile.path),
+      'image': kIsWeb
+          ? MultipartFile.fromBytes(
+              imageFile as Uint8List,
+              filename: imageName ?? 'image.jpg',
+            )
+          : await MultipartFile.fromFile((imageFile as File).path),
     });
 
     final res = await ApiClient.instance.post('/reports', data: formData);

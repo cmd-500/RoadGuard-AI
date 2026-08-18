@@ -76,7 +76,7 @@ public class Report {
     @Builder.Default
     private Integer downvoteCount = 0;
 
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by", nullable = true)
     @JdbcTypeCode(SqlTypes.UUID)
     private String createdBy;
 
@@ -99,6 +99,13 @@ public class Report {
 
     public enum HazardType {
         POTHOLE,
+        ACCIDENT,
+        FOG,
+        SPEED_BREAKER,
+        WATERLOGGING,
+        ROAD_DAMAGE,
+        CONSTRUCTION,
+        EMERGENCY,
         UNMARKED_BREAKER,
         ILLEGAL_BREAKER,
         WATERLOGGED_HAZARD,

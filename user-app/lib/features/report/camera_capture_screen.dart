@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:io' show File;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -6,7 +7,7 @@ import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
 
 class CameraCaptureScreen extends StatefulWidget {
-  final Function(String imagePath) onPhotoCaptured;
+  final Function(Uint8List imageBytes, String imageName) onPhotoCaptured;
 
   const CameraCaptureScreen({
     super.key,
@@ -24,6 +25,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
   bool _isInitialized = false;
   bool _isCapturing = false;
   XFile? _capturedImage;
+  Uint8List? _capturedImageBytes;
   String? _error;
 
   @override
@@ -91,13 +93,15 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
 
     try {
       final image = await controller.takePicture();
+      final bytes = await image.readAsBytes();
       setState(() {
         _capturedImage = image;
+        _capturedImageBytes = bytes;
         _isCapturing = false;
       });
 
       if (mounted) {
-        widget.onPhotoCaptured(image.path);
+        widget.onPhotoCaptured(bytes, image.name);
       }
     } catch (e) {
       setState(() {
@@ -108,7 +112,10 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
   }
 
   void _retakePhoto() {
-    setState(() => _capturedImage = null);
+    setState(() {
+      _capturedImage = null;
+      _capturedImageBytes = null;
+    });
   }
 
   @override
@@ -121,7 +128,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
       return _buildLoadingState();
     }
 
-    if (_capturedImage != null) {
+    if (_capturedImageBytes != null) {
       return _buildPreviewState();
     }
 
@@ -181,10 +188,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
               Expanded(
                 child: Container(
                   alignment: Alignment.center,
-                  child: Text(
-                    'Tap to capture',
-                    style: AppTypography.titleMedium.copyWith(
-                      color: AppColors.onPrimary.withValues(alpha: 0.8),
+                  child: AnimatedOpacity(
+                    opacity: (_isInitialized && !_isCapturing) ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      'Tap to capture',
+                      style: AppTypography.titleMedium.copyWith(
+                        color: AppColors.onPrimary.withValues(alpha: 0.8),
+                      ),
                     ),
                   ),
                 ),
@@ -313,8 +324,8 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
   Widget _buildPreviewState() {
     return Stack(
       children: [
-        Image.file(
-          File(_capturedImage!.path),
+        Image.memory(
+          _capturedImageBytes!,
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
