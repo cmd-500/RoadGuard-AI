@@ -22,6 +22,26 @@ enum Severity {
   critical,
 }
 
+/// The backend enums (Report.HazardType / Report.Severity in the Java
+/// service) are UPPER_SNAKE_CASE, e.g. SPEED_BREAKER, ROAD_DAMAGE, MEDIUM.
+/// Dart enum `.name` is camelCase, e.g. speedBreaker, roadDamage, medium.
+/// Sending `.name` directly to the API makes every submission fail with a
+/// 400 (Jackson can't map "pothole" to POTHOLE, etc). Use this to convert
+/// before sending hazardType/severity in any request body.
+extension BackendEnumName on Enum {
+  String toBackendName() {
+    final buffer = StringBuffer();
+    for (final rune in name.runes) {
+      final char = String.fromCharCode(rune);
+      if (char == char.toUpperCase() && char != char.toLowerCase()) {
+        buffer.write('_');
+      }
+      buffer.write(char.toUpperCase());
+    }
+    return buffer.toString();
+  }
+}
+
 enum ReportStatus {
   pending,
   inProgress,

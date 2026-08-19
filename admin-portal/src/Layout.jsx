@@ -152,7 +152,18 @@ export function Layout({
       </nav>
 
       <main className="flex-1 flex flex-col relative">
-        {!showPastRecords && children}
+        {!showPastRecords && (
+          <>
+            {children}
+            {!auth && (
+              <div
+                className="absolute inset-0 z-40 bg-transparent"
+                onClick={() => setLoginPrompt(true)}
+                style={{ pointerEvents: 'auto' }}
+              />
+            )}
+          </>
+        )}
 
         {showPastRecords && (
           <div className="absolute inset-0 bg-slate-50 z-[40] p-6 overflow-y-auto">

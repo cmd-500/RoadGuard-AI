@@ -23,8 +23,8 @@ public interface ReportRepository extends JpaRepository<Report, String> {
     @Query(value = """
         SELECT * FROM reports r
         WHERE r.report_status != :rejectedStatus
-        AND ST_DWithin(r.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radiusMeters)
-        ORDER BY ST_Distance(r.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography)
+        AND ST_DWithin(r.location, CAST(ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) AS geography), :radiusMeters)
+        ORDER BY ST_Distance(r.location, CAST(ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) AS geography))
         """, nativeQuery = true)
     List<Report> findNearbyReports(
             @Param("rejectedStatus") String rejectedStatus,
@@ -36,7 +36,7 @@ public interface ReportRepository extends JpaRepository<Report, String> {
     @Query(value = """
         SELECT * FROM reports r
         WHERE r.report_status != :rejectedStatus
-        AND ST_Within(r.location, ST_Buffer(ST_GeomFromText(:polylineWKT, 4326)::geography, :bufferMeters)::geometry)
+        AND ST_Within(r.location, CAST(ST_Buffer(CAST(ST_GeomFromText(:polylineWKT, 4326) AS geography), :bufferMeters) AS geometry))
         """, nativeQuery = true)
     List<Report> findReportsOnRoute(
             @Param("rejectedStatus") String rejectedStatus,
@@ -48,7 +48,7 @@ public interface ReportRepository extends JpaRepository<Report, String> {
         SELECT * FROM reports r
         WHERE r.created_at >= :since
         AND r.verification_image_hash IS NOT NULL
-        AND ST_DWithin(r.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radiusMeters)
+        AND ST_DWithin(r.location, CAST(ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) AS geography), :radiusMeters)
         """, nativeQuery = true)
     List<Report> findPotentialDuplicates(
             @Param("since") LocalDateTime since,

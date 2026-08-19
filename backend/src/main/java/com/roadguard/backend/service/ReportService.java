@@ -49,6 +49,10 @@ public class ReportService {
             throw ApiException.badRequest("IMAGE_REQUIRED", "An image is required (capture with camera, not gallery)");
         }
 
+        if (request.getDescription() == null || request.getDescription().isBlank()) {
+            request.setDescription("No additional details provided.");
+        }
+
         byte[] imageBytes;
         try {
             imageBytes = image.getBytes();

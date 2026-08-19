@@ -1,6 +1,7 @@
 package com.roadguard.backend.service;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,14 +22,15 @@ public class CloudinaryService {
 
     public UploadResult uploadImage(MultipartFile file) {
         try {
+            Transformation transformation = new Transformation()
+                    .width(1600)
+                    .crop("limit")
+                    .quality("auto");
+
             Map<String, Object> params = ObjectUtils.asMap(
                     "folder", "roadguard/reports",
                     "resource_type", "image",
-                    "transformation", ObjectUtils.asMap(
-                            "width", 1600,
-                            "crop", "limit",
-                            "quality", "auto"
-                    )
+                    "transformation", transformation
             );
 
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), params);

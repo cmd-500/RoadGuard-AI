@@ -22,6 +22,7 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JdbcTypeCode(SqlTypes.UUID)
+    @Convert(converter = UuidStringConverter.class)
     private String id;
 
     @Column(nullable = false, length = 200)
@@ -78,6 +79,7 @@ public class Report {
 
     @Column(name = "created_by", nullable = true)
     @JdbcTypeCode(SqlTypes.UUID)
+    @Convert(converter = UuidStringConverter.class)
     private String createdBy;
 
     @Column(name = "created_at", nullable = false)
@@ -171,6 +173,7 @@ public class Report {
 
         @Column(name = "verification_duplicate_of_report")
         @JdbcTypeCode(SqlTypes.UUID)
+        @Convert(converter = UuidStringConverter.class)
         private String duplicateOfReport;
 
         @Column(name = "verification_trust_effect_applied")

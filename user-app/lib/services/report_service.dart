@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io' show File;
 import 'dart:typed_data';
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' show Dio, FormData, MultipartFile;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http_parser/http_parser.dart';
 import '../models/report_model.dart';
 import 'api_client.dart';
 
@@ -17,7 +19,7 @@ class ReportService {
     required dynamic imageFile, // File on mobile, Uint8List on web
     String? imageName,
   }) async {
-    final formData = FormData.fromMap({
+    final dataJson = jsonEncode({
       'title': title,
       'description': description,
       'address': address,
@@ -25,6 +27,13 @@ class ReportService {
       'severity': severity,
       'latitude': latitude,
       'longitude': longitude,
+    });
+
+    final formData = FormData.fromMap({
+      'data': MultipartFile.fromString(
+        dataJson,
+        contentType: MediaType('application', 'json'),
+      ),
       'image': kIsWeb
           ? MultipartFile.fromBytes(
               imageFile as Uint8List,

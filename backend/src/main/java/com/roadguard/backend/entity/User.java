@@ -28,6 +28,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JdbcTypeCode(SqlTypes.UUID)
+    @Convert(converter = UuidStringConverter.class)
     private String id;
 
     @Column(nullable = false)

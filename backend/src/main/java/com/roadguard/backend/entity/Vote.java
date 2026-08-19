@@ -25,14 +25,17 @@ public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JdbcTypeCode(SqlTypes.UUID)
+    @Convert(converter = UuidStringConverter.class)
     private String id;
 
     @Column(name = "report_id", nullable = false)
     @JdbcTypeCode(SqlTypes.UUID)
+    @Convert(converter = UuidStringConverter.class)
     private String reportId;
 
     @Column(name = "user_id", nullable = false)
     @JdbcTypeCode(SqlTypes.UUID)
+    @Convert(converter = UuidStringConverter.class)
     private String userId;
 
     @Enumerated(EnumType.STRING)

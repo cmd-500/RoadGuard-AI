@@ -22,8 +22,7 @@ public class ReportDtos {
         @Size(min = 3, max = 200)
         private String title;
 
-        @NotBlank
-        @Size(min = 5, max = 2000)
+        @Size(max = 2000)
         private String description;
 
         @NotBlank

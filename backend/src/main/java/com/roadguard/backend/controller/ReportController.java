@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/reports")
@@ -28,9 +27,9 @@ public class ReportController {
     public ResponseEntity<ReportDtos.Response> createReport(
             @RequestPart("data") @Valid ReportDtos.CreateRequest request,
             @RequestPart("image") MultipartFile image,
-            @AuthenticationPrincipal Optional<User> user
+            @AuthenticationPrincipal User user
     ) {
-        String userId = user.map(User::getId).orElse(null);
+        String userId = user != null ? user.getId() : null;
         return ResponseEntity.status(201).body(reportService.createReport(request, image, userId));
     }
 
