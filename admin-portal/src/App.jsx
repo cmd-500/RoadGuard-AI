@@ -139,7 +139,7 @@ function getIconConfig(type) {
 }
 
 export default function App() {
-  const [auth, setAuth] = useState(false);
+  const [auth, setAuth] = useState(() => localStorage.getItem("roadguard_auth") === "true");
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState("all");
   const [sel, setSel] = useState(null);
@@ -230,8 +230,14 @@ export default function App() {
       <>
         <Layout
             auth={auth}
-            onLogin={() => setAuth(true)}
-            onLogout={() => setAuth(false)}
+            onLogin={() => {
+              localStorage.setItem("roadguard_auth", "true");
+              setAuth(true);
+            }}
+            onLogout={() => {
+              localStorage.removeItem("roadguard_auth");
+              setAuth(false);
+            }}
             data={data}
             onResolve={handleFix}
             onSelectAlert={setSel}

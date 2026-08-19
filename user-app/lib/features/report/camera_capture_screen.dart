@@ -181,7 +181,16 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
   Widget _buildCameraView() {
     return Stack(
       children: [
-        CameraPreview(_controller!),
+        Positioned.fill(
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: _controller!.value.previewSize!.height,
+              height: _controller!.value.previewSize!.width,
+              child: CameraPreview(_controller!),
+            ),
+          ),
+        ),
         Positioned.fill(
           child: Column(
             children: [

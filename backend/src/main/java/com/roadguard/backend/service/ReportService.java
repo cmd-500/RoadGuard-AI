@@ -184,7 +184,9 @@ public class ReportService {
                 .orElseThrow(() -> ApiException.notFound("REPORT_NOT_FOUND", "Report not found"));
         report.setStatus(status);
         reportRepository.save(report);
-        return mapToResponse(report);
+        ReportDtos.Response response = mapToResponse(report);
+        notificationService.broadcastReportUpdate(id, response);
+        return response;
     }
 
     private ReportDtos.Response mapToResponse(Report report) {

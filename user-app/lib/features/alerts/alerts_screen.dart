@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/design_system/index.dart';
@@ -13,6 +14,7 @@ class AlertsScreen extends StatefulWidget {
 }
 
 class _AlertsScreenState extends State<AlertsScreen> with SingleTickerProviderStateMixin {
+  Timer? _pollTimer;
   static const _categories = <AlertCategory>[
     AlertCategory.all,
     AlertCategory.road,
@@ -41,10 +43,14 @@ class _AlertsScreenState extends State<AlertsScreen> with SingleTickerProviderSt
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AlertProvider>().fetchAlerts();
     });
+    _pollTimer = Timer.periodic(const Duration(seconds: 20), (_) {
+      context.read<AlertProvider>().fetchAlerts();
+    });
   }
 
   @override
   void dispose() {
+    _pollTimer?.cancel();
     _animationController.dispose();
     super.dispose();
   }

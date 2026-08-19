@@ -65,9 +65,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? AppColorsDark.background : AppColors.background,
+      backgroundColor: AppColors.background,
       appBar: AppAppBar(
         title: 'Report Issue',
         showBackButton: true,
@@ -100,9 +99,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   }
 
   Widget _buildProgressIndicator() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      color: isDark ? AppColorsDark.surface : AppColors.surface,
+      color: AppColors.surface,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.lg,
