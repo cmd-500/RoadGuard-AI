@@ -11,6 +11,7 @@ import 'shared/repositories/auth_repository.dart';
 import 'shared/repositories/report_repository.dart';
 import 'shared/repositories/vote_repository.dart';
 import 'shared/repositories/alert_repository.dart';
+import 'shared/repositories/alert_repository_impl.dart';
 import 'shared/services/api_client.dart';
 
 void main() {
@@ -37,7 +38,9 @@ class RoadSafeApp extends StatelessWidget {
           create: (_) => VoteRepositoryImpl(apiClient: apiClient),
         ),
         Provider<AlertRepository>(
-          create: (_) => MockAlertRepositoryImpl(),
+          create: (context) => ApiAlertRepositoryImpl(
+            reportRepository: context.read<ReportRepository>(),
+          ),
         ),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(

@@ -64,6 +64,15 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final baseDecoration = theme.inputDecorationTheme;
+    // The color constants in AppColors are light-theme-only, so the typed
+    // text must be resolved against the active brightness, not hardcoded.
+    // Previously this always used AppColors.textPrimary, which made typed
+    // text nearly invisible in dark mode (dark text on a dark/mismatched
+    // fill), even though the cursor still moved normally.
+    final isDark = theme.brightness == Brightness.dark;
+    final effectiveTextColor = enabled
+        ? (isDark ? AppColorsDark.textPrimary : AppColors.textPrimary)
+        : (isDark ? AppColorsDark.textDisabled : AppColors.textDisabled);
 
     return TextFormField(
       controller: controller,
@@ -83,8 +92,8 @@ class AppTextField extends StatelessWidget {
       inputFormatters: inputFormatters,
       focusNode: focusNode,
       autovalidateMode: autovalidateMode,
-      style: baseDecoration.labelStyle?.copyWith(
-        color: enabled ? AppColors.textPrimary : AppColors.textDisabled,
+      style: (baseDecoration.labelStyle ?? const TextStyle()).copyWith(
+        color: effectiveTextColor,
         fontSize: 16,
       ),
       decoration: InputDecoration(

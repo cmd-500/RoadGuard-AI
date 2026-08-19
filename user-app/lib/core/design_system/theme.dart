@@ -477,5 +477,47 @@ class AppTheme {
           bodyColor: AppColorsDark.textPrimary,
           displayColor: AppColorsDark.textPrimary,
         ),
+        // Without this, dark mode fell back to Flutter's default
+        // InputDecorationTheme, which doesn't match AppColorsDark and was
+        // part of why typed text could become unreadable in dark mode.
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColorsDark.surfaceContainerLow,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.input),
+            borderSide: BorderSide(color: AppColorsDark.outline),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.input),
+            borderSide: BorderSide(color: AppColorsDark.outline),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.input),
+            borderSide: BorderSide(color: AppColorsDark.primary, width: 2),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.input),
+            borderSide: BorderSide(color: AppColorsDark.error),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.input),
+            borderSide: BorderSide(color: AppColorsDark.error, width: 2),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.input),
+            borderSide: BorderSide(color: AppColorsDark.outlineVariant),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
+          hintStyle: AppTypographyDark.bodyMedium.copyWith(color: AppColorsDark.textTertiary),
+          labelStyle: AppTypographyDark.titleSmall.copyWith(color: AppColorsDark.textSecondary),
+          floatingLabelStyle: AppTypographyDark.titleSmall.copyWith(color: AppColorsDark.primary),
+          errorStyle: AppTypographyDark.bodySmall.copyWith(color: AppColorsDark.error),
+          helperStyle: AppTypographyDark.bodySmall.copyWith(color: AppColorsDark.textTertiary),
+          prefixIconColor: AppColorsDark.textTertiary,
+          suffixIconColor: AppColorsDark.textTertiary,
+        ),
       );
 }

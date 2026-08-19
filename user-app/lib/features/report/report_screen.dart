@@ -65,8 +65,9 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColorsDark.background : AppColors.background,
       appBar: AppAppBar(
         title: 'Report Issue',
         showBackButton: true,
@@ -99,8 +100,9 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   }
 
   Widget _buildProgressIndicator() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      color: AppColors.surface,
+      color: isDark ? AppColorsDark.surface : AppColors.surface,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.lg,
@@ -228,11 +230,14 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   }
 
   Widget _buildSeveritySelector() {
+    // Only Low / Medium / High are offered here because the admin portal
+    // only recognizes those three severities (see admin-portal/src/App.jsx
+    // sevFromBackend). A 4th "Critical" option would submit successfully
+    // but silently fall back to "low" once it reaches the admin dashboard.
     final severities = [
       (Severity.low, 'Low', 'Minor issue', AppIcons.circle, 'LOW'),
       (Severity.medium, 'Medium', 'Noticeable hazard', AppIcons.warning, 'MEDIUM'),
       (Severity.high, 'High', 'Dangerous condition', AppIcons.warningCircle, 'HIGH'),
-      (Severity.critical, 'Critical', 'Immediate danger', AppIcons.warningOctagon, 'CRITICAL'),
     ];
 
     return Column(
@@ -324,7 +329,6 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
           prefixIcon: AppIcons.location,
           suffixIcon: locationProvider.isLoading ? null : AppIcons.gps,
           onSuffixPressed: locationProvider.isLoading ? null : _loadCurrentLocation,
-          fillColor: AppColors.surfaceContainerLow,
         ),
         if (locationProvider.isLoading) ...[
           const SizedBox(height: AppSpacing.sm),
@@ -370,7 +374,6 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
           controller: _detailsController,
           maxLines: 4,
           maxLength: 200,
-          fillColor: AppColors.surfaceContainerLow,
         ),
       ],
     );
@@ -690,14 +693,14 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                 trailingIcon: _currentStep == 2 ? null : AppIcons.forward,
                 onPressed: _currentStep == 0
                     ? (_selectedHazardType != null && _selectedLocation != null
-                        ? () {
-                      setState(() => _currentStep++);
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                        : null)
+                    ? () {
+                  setState(() => _currentStep++);
+                  _pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
+                    : null)
                     : _currentStep == 1
                     ? null // Handled by camera screen
                     : _submitReport,
