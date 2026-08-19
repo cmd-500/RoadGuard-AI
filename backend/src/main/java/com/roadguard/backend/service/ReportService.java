@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,7 +66,7 @@ public class ReportService {
 
         boolean gpsMatch = true;
         Double gpsDistanceMeters = null;
-        String duplicateOfReport = null;
+        UUID duplicateOfReport = null;
 
         if (verification.exifGps() != null) {
             gpsDistanceMeters = imageVerificationUtil.haversineDistance(
@@ -119,12 +120,12 @@ public class ReportService {
                 .imageUrl(uploadResult.secureUrl())
                 .imagePublicId(uploadResult.publicId())
                 .verification(verificationEntity)
-                .createdBy(userId)
+                .createdBy(userId != null ? UUID.fromString(userId) : null)
                 .build();
 
         reportRepository.save(report);
         if (userId != null) {
-            userRepository.incrementReportsSubmitted(userId);
+            userRepository.incrementReportsSubmitted(UUID.fromString(userId));
         }
 
         notificationService.broadcastNewReport(mapToResponse(report));
@@ -145,7 +146,7 @@ public class ReportService {
     }
 
     public ReportDtos.Response getReportById(String id) {
-        Report report = reportRepository.findById(id)
+        Report report = reportRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> ApiException.notFound("REPORT_NOT_FOUND", "Report not found"));
         return mapToResponse(report);
     }
@@ -179,7 +180,7 @@ public class ReportService {
 
     @Transactional
     public ReportDtos.Response updateStatus(String id, Report.Status status) {
-        Report report = reportRepository.findById(id)
+        Report report = reportRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> ApiException.notFound("REPORT_NOT_FOUND", "Report not found"));
         report.setStatus(status);
         reportRepository.save(report);
@@ -190,7 +191,7 @@ public class ReportService {
         User creator = report.getCreatedBy() != null ? userRepository.findById(report.getCreatedBy()).orElse(null) : null;
 
         return ReportDtos.Response.builder()
-                .id(report.getId())
+                .id(report.getId().toString())
                 .title(report.getTitle())
                 .description(report.getDescription())
                 .address(report.getAddress())
@@ -206,7 +207,7 @@ public class ReportService {
                 .upvoteCount(report.getUpvoteCount())
                 .downvoteCount(report.getDownvoteCount())
                 .createdBy(creator != null ? ReportDtos.Response.UserInfo.builder()
-                        .id(creator.getId())
+                        .id(creator.getId().toString())
                         .name(creator.getName())
                         .trustScore(creator.getTrustScore())
                         .isTrusted(creator.isTrusted())
@@ -220,7 +221,7 @@ public class ReportService {
         User creator = report.getCreatedBy() != null ? userRepository.findById(report.getCreatedBy()).orElse(null) : null;
 
         return ReportDtos.NearbyReportResponse.builder()
-                .id(report.getId())
+                .id(report.getId().toString())
                 .title(report.getTitle())
                 .hazardType(report.getHazardType())
                 .severity(report.getSeverity())
@@ -230,7 +231,7 @@ public class ReportService {
                 .communityStatus(report.getCommunityStatus())
                 .voteScore(report.getVoteScore())
                 .createdBy(creator != null ? ReportDtos.NearbyReportResponse.UserInfo.builder()
-                        .id(creator.getId())
+                        .id(creator.getId().toString())
                         .name(creator.getName())
                         .trustScore(creator.getTrustScore())
                         .isTrusted(creator.isTrusted())
@@ -248,7 +249,7 @@ public class ReportService {
                 .imageHash(v.getImageHash())
                 .gpsMatch(v.getGpsMatch())
                 .gpsDistanceMeters(v.getGpsDistanceMeters())
-                .duplicateOfReport(v.getDuplicateOfReport())
+                .duplicateOfReport(v.getDuplicateOfReport() != null ? v.getDuplicateOfReport().toString() : null)
                 .trustEffectApplied(v.getTrustEffectApplied())
                 .build();
     }

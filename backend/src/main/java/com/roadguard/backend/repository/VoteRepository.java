@@ -8,22 +8,23 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface VoteRepository extends JpaRepository<Vote, String> {
+public interface VoteRepository extends JpaRepository<Vote, UUID> {
 
-    Optional<Vote> findByReportIdAndUserId(String reportId, String userId);
+    Optional<Vote> findByReportIdAndUserId(UUID reportId, UUID userId);
 
-    List<Vote> findByReportId(String reportId);
+    List<Vote> findByReportId(UUID reportId);
 
     @Query("SELECT COUNT(v) FROM Vote v WHERE v.reportId = :reportId AND v.voteType = 'UPVOTE'")
-    long countUpvotesByReportId(@Param("reportId") String reportId);
+    long countUpvotesByReportId(@Param("reportId") UUID reportId);
 
     @Query("SELECT COUNT(v) FROM Vote v WHERE v.reportId = :reportId AND v.voteType = 'DOWNVOTE'")
-    long countDownvotesByReportId(@Param("reportId") String reportId);
+    long countDownvotesByReportId(@Param("reportId") UUID reportId);
 
     @Query("SELECT SUM(CASE WHEN v.voteType = 'UPVOTE' THEN v.weight ELSE -v.weight END) FROM Vote v WHERE v.reportId = :reportId")
-    Integer getVoteScoreByReportId(@Param("reportId") String reportId);
+    Integer getVoteScoreByReportId(@Param("reportId") UUID reportId);
 
-    boolean existsByReportIdAndUserId(String reportId, String userId);
+    boolean existsByReportIdAndUserId(UUID reportId, UUID userId);
 }

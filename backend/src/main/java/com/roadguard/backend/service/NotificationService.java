@@ -14,7 +14,7 @@ public class NotificationService {
 
     public void notifyNearbyUsers(Report report, double latitude, double longitude, double radiusMeters) {
         ReportDtos.NearbyReportResponse response = ReportDtos.NearbyReportResponse.builder()
-                .id(report.getId())
+                .id(report.getId().toString())
                 .title(report.getTitle())
                 .hazardType(report.getHazardType())
                 .severity(report.getSeverity())

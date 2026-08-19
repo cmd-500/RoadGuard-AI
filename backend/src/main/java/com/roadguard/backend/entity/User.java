@@ -3,9 +3,7 @@ package com.roadguard.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -27,9 +26,7 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JdbcTypeCode(SqlTypes.UUID)
-    @Convert(converter = UuidStringConverter.class)
-    private String id;
+    private UUID id;
 
     @Column(nullable = false)
     private String name;

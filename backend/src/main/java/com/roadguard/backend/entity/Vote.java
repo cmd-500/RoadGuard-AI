@@ -3,10 +3,9 @@ package com.roadguard.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "votes", uniqueConstraints = {
@@ -24,19 +23,13 @@ public class Vote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JdbcTypeCode(SqlTypes.UUID)
-    @Convert(converter = UuidStringConverter.class)
-    private String id;
+    private UUID id;
 
     @Column(name = "report_id", nullable = false)
-    @JdbcTypeCode(SqlTypes.UUID)
-    @Convert(converter = UuidStringConverter.class)
-    private String reportId;
+    private UUID reportId;
 
     @Column(name = "user_id", nullable = false)
-    @JdbcTypeCode(SqlTypes.UUID)
-    @Convert(converter = UuidStringConverter.class)
-    private String userId;
+    private UUID userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "vote_type", nullable = false)

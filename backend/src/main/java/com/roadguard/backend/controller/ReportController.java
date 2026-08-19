@@ -29,7 +29,7 @@ public class ReportController {
             @RequestPart("image") MultipartFile image,
             @AuthenticationPrincipal User user
     ) {
-        String userId = user != null ? user.getId() : null;
+        String userId = user != null ? user.getId().toString() : null;
         return ResponseEntity.status(201).body(reportService.createReport(request, image, userId));
     }
 

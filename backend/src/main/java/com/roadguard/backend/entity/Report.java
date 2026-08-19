@@ -2,13 +2,12 @@ package com.roadguard.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "reports")
@@ -21,9 +20,7 @@ public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JdbcTypeCode(SqlTypes.UUID)
-    @Convert(converter = UuidStringConverter.class)
-    private String id;
+    private UUID id;
 
     @Column(nullable = false, length = 200)
     private String title;
@@ -78,9 +75,7 @@ public class Report {
     private Integer downvoteCount = 0;
 
     @Column(name = "created_by", nullable = true)
-    @JdbcTypeCode(SqlTypes.UUID)
-    @Convert(converter = UuidStringConverter.class)
-    private String createdBy;
+    private UUID createdBy;
 
     @Column(name = "created_at", nullable = false)
     @Builder.Default
@@ -172,9 +167,7 @@ public class Report {
         private Double gpsDistanceMeters;
 
         @Column(name = "verification_duplicate_of_report")
-        @JdbcTypeCode(SqlTypes.UUID)
-        @Convert(converter = UuidStringConverter.class)
-        private String duplicateOfReport;
+        private UUID duplicateOfReport;
 
         @Column(name = "verification_trust_effect_applied")
         @Builder.Default

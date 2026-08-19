@@ -69,7 +69,7 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .user(AuthDtos.AuthResponse.UserInfo.builder()
-                        .id(user.getId())
+                        .id(user.getId().toString())
                         .name(user.getName())
                         .email(user.getEmail())
                         .role(user.getRole().name())

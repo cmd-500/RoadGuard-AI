@@ -12,9 +12,10 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ReportRepository extends JpaRepository<Report, String> {
+public interface ReportRepository extends JpaRepository<Report, UUID> {
 
     Page<Report> findByStatusNot(Report.Status status, Pageable pageable);
 
@@ -57,5 +58,5 @@ public interface ReportRepository extends JpaRepository<Report, String> {
             @Param("radiusMeters") double radiusMeters
     );
 
-    List<Report> findByCreatedBy(String userId);
+    List<Report> findByCreatedBy(UUID userId);
 }

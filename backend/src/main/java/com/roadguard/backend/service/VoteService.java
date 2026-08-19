@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class VoteService {
@@ -23,18 +25,21 @@ public class VoteService {
 
     @Transactional
     public VoteDtos.VoteResponse castVote(String reportId, VoteDtos.VoteRequest request, String userId) {
-        Report report = reportRepository.findById(reportId)
+        UUID reportUuid = UUID.fromString(reportId);
+        UUID userUuid = UUID.fromString(userId);
+
+        Report report = reportRepository.findById(reportUuid)
                 .orElseThrow(() -> ApiException.notFound("REPORT_NOT_FOUND", "Report not found"));
 
-        if (report.getCreatedBy().equals(userId)) {
+        if (userUuid.equals(report.getCreatedBy())) {
             throw ApiException.badRequest("SELF_VOTE", "You cannot vote on your own report");
         }
 
-        User voter = userRepository.findById(userId)
+        User voter = userRepository.findById(userUuid)
                 .orElseThrow(() -> ApiException.notFound("USER_NOT_FOUND", "User not found"));
 
         int weight = trustService.getVoteWeight(voter);
-        Vote existingVote = voteRepository.findByReportIdAndUserId(reportId, userId).orElse(null);
+        Vote existingVote = voteRepository.findByReportIdAndUserId(reportUuid, userUuid).orElse(null);
 
         if (existingVote != null) {
             if (existingVote.getVoteType() == request.getVoteType()) {
@@ -54,8 +59,8 @@ public class VoteService {
             voteRepository.save(existingVote);
         } else {
             Vote vote = Vote.builder()
-                    .reportId(reportId)
-                    .userId(userId)
+                    .reportId(reportUuid)
+                    .userId(userUuid)
                     .voteType(request.getVoteType())
                     .weight(weight)
                     .build();
@@ -73,7 +78,7 @@ public class VoteService {
         reportRepository.save(report);
 
         return VoteDtos.VoteResponse.builder()
-                .id(existingVote != null ? existingVote.getId() : "")
+                .id(existingVote != null ? existingVote.getId().toString() : "")
                 .reportId(reportId)
                 .userId(userId)
                 .voteType(request.getVoteType())
@@ -82,10 +87,13 @@ public class VoteService {
     }
 
     public VoteDtos.VoteStatusResponse getVoteStatus(String reportId, String userId) {
-        Report report = reportRepository.findById(reportId)
+        UUID reportUuid = UUID.fromString(reportId);
+        UUID userUuid = UUID.fromString(userId);
+
+        Report report = reportRepository.findById(reportUuid)
                 .orElseThrow(() -> ApiException.notFound("REPORT_NOT_FOUND", "Report not found"));
 
-        Vote.VoteType userVote = voteRepository.findByReportIdAndUserId(reportId, userId)
+        Vote.VoteType userVote = voteRepository.findByReportIdAndUserId(reportUuid, userUuid)
                 .map(Vote::getVoteType)
                 .orElse(null);
 

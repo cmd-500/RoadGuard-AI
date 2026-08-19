@@ -22,7 +22,7 @@ public class VoteController {
             @Valid @RequestBody VoteDtos.VoteRequest request,
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(voteService.castVote(reportId, request, user.getId()));
+        return ResponseEntity.ok(voteService.castVote(reportId, request, user.getId().toString()));
     }
 
     @GetMapping("/me")
@@ -30,6 +30,6 @@ public class VoteController {
             @PathVariable String reportId,
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(voteService.getVoteStatus(reportId, user.getId()));
+        return ResponseEntity.ok(voteService.getVoteStatus(reportId, user.getId().toString()));
     }
 }

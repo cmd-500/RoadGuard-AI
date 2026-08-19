@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
+public interface UserRepository extends JpaRepository<User, java.util.UUID> {
 
     Optional<User> findByEmail(String email);
 
@@ -21,10 +21,10 @@ public interface UserRepository extends JpaRepository<User, String> {
     long countTrustedUsers();
 
     @Query("SELECT u FROM User u WHERE u.id = :id")
-    Optional<User> findByIdWithRole(@Param("id") String id);
+    Optional<User> findByIdWithRole(@Param("id") java.util.UUID id);
 
     @Modifying
     @Transactional
     @Query("UPDATE User u SET u.reportsSubmitted = u.reportsSubmitted + 1 WHERE u.id = :userId")
-    void incrementReportsSubmitted(@Param("userId") String userId);
+    void incrementReportsSubmitted(@Param("userId") java.util.UUID userId);
 }
