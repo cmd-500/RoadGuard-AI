@@ -9,6 +9,8 @@ import '../../shared/models/report.dart' show Severity;
 import '../../shared/providers/report_provider.dart';
 import '../../shared/providers/location_provider.dart';
 import '../../shared/providers/auth_provider.dart';
+import '../../shared/providers/alert_provider.dart';
+import '../../shared/models/alert.dart';
 import '../map/map_screen.dart';
 import '../report/report_screen.dart';
 import '../alerts/alerts_screen.dart';
@@ -43,6 +45,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LocationProvider>().getCurrentLocation();
       context.read<ReportProvider>().fetchReports();
+      // Live Alerts are reports the admin-portal has reviewed and marked
+      // "Resolved" — see ApiAlertRepositoryImpl for how that's derived.
+      context.read<AlertProvider>().fetchAlerts();
     });
   }
 
@@ -86,10 +91,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           padding: const EdgeInsets.only(left: AppSpacing.screenPadding),
         ),
         actions: [
-          IconButton(
-            icon: Icon(AppIcons.bell, size: 24),
-            onPressed: () {},
+          Padding(
             padding: const EdgeInsets.only(right: AppSpacing.screenPadding),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  icon: Icon(AppIcons.bell, size: 24),
+                  onPressed: () {},
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: AppColors.error,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.surface, width: 1.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -104,8 +129,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildGreetingSection(userName),
-                      const SizedBox(height: AppSpacing.xxl),
                       _buildSearchField(),
                       const SizedBox(height: AppSpacing.xxl),
                       _buildMapPreview(locationProvider),
@@ -121,56 +144,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildGreetingSection(String userName) {
-    final hour = DateTime.now().hour;
-    String greeting;
-    if (hour < 12) {
-      greeting = 'Good Morning';
-    } else if (hour < 17) {
-      greeting = 'Good Afternoon';
-    } else {
-      greeting = 'Good Evening';
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '$greeting, $userName',
-                style: AppTypography.headlineMedium,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Let\'s make your journey safe today.',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            boxShadow: AppShadows.primaryGlow,
-          ),
-          child: Icon(
-            AppIcons.car,
-            size: 36,
-            color: AppColors.onPrimary,
-          ),
-        ),
-      ],
     );
   }
 
@@ -390,11 +363,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               onTap: () => _changeTab(AppTab.alerts),
             ),
             AppQuickActionCard(
+              title: 'Report Issue',
+              subtitle: 'Help others',
+              icon: AppIcons.camera,
+              iconBackgroundColor: AppColors.successLight,
+              iconColor: AppColors.success,
+              onTap: () => _changeTab(AppTab.report),
+            ),
+            AppQuickActionCard(
               title: 'Plan Your Trip',
               subtitle: 'Safe route',
               icon: AppIcons.map,
-              iconBackgroundColor: AppColors.successLight,
-              iconColor: AppColors.success,
+              iconBackgroundColor: AppColors.primaryContainer,
+              iconColor: AppColors.primary,
               onTap: () => _changeTab(AppTab.map),
             ),
             AppQuickActionCard(
@@ -405,14 +386,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               iconColor: AppColors.warning,
               onTap: () {},
             ),
-            AppQuickActionCard(
-              title: 'My Reports',
-              subtitle: 'View history',
-              icon: AppIcons.flag,
-              iconBackgroundColor: AppColors.primaryContainer,
-              iconColor: AppColors.primary,
-              onTap: () => _changeTab(AppTab.profile),
-            ),
           ],
         ),
       ],
@@ -420,7 +393,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildNearbyAlerts() {
-    final reportProvider = context.watch<ReportProvider>();
+    final alertProvider = context.watch<AlertProvider>();
+    final alerts = alertProvider.alerts;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -431,35 +405,75 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Text('Nearby Alerts', style: AppTypography.headlineSmall),
             AppTertiaryButton(
               label: 'View All',
-              onPressed: () => _changeTab(AppTab.map),
+              onPressed: () => _changeTab(AppTab.alerts),
               trailingIcon: AppIcons.caretRight,
             ),
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
-        if (reportProvider.isLoading)
+        if (alertProvider.isLoading)
           const Center(child: AppCircularProgress())
-        else if (reportProvider.nearbyReports.isEmpty)
-          _buildEmptyAlerts()
-        else
-          Column(
-            children: reportProvider.nearbyReports
-                .take(3)
-                .map((report) => Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: AppHazardCard(
-                        hazardType: report.hazardType.name,
-                        title: report.title,
-                        distance: '${(report.distanceMeters / 1000).toStringAsFixed(1)} km',
-                        location: report.creator?.name ?? 'Unknown location',
-                        severity: _getRiskLevel(report.severity.name),
-                        imageUrl: report.imageUrl,
-                        onTap: () {},
-                      ),
-                    ))
-                .toList(),
-          ),
+        else if (alertProvider.error != null)
+          _buildAlertsErrorState(alertProvider.error!)
+        else if (alerts.isEmpty)
+            _buildEmptyAlerts()
+          else
+            Column(
+              children: alerts
+                  .take(3)
+                  .map((alert) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: AppAlertListItem(
+                  hazardType: alert.category.name,
+                  title: alert.title,
+                  subtitle: alert.affectedRoads.isNotEmpty
+                      ? alert.affectedRoads.first
+                      : alert.location,
+                  distance: alert.distanceKm > 0
+                      ? (alert.distanceKm < 1
+                      ? '${(alert.distanceKm * 1000).round()} m'
+                      : '${alert.distanceKm.toStringAsFixed(1)} km')
+                      : '',
+                  severity: alert.severityDisplay,
+                  onTap: () => _changeTab(AppTab.alerts),
+                ),
+              ))
+                  .toList(),
+            ),
       ],
+    );
+  }
+
+  Widget _buildAlertsErrorState(String error) {
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: [
+              Icon(AppIcons.warningCircle, size: 20, color: AppColors.error),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Couldn\'t load live alerts',
+                  style: AppTypography.titleMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            error,
+            style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppTertiaryButton(
+            label: 'Retry',
+            onPressed: () => context.read<AlertProvider>().fetchAlerts(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -482,20 +496,5 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ],
       ),
     );
-  }
-
-  String _getRiskLevel(String severity) {
-    switch (severity.toUpperCase()) {
-      case 'CRITICAL':
-        return 'HIGH RISK';
-      case 'HIGH':
-        return 'HIGH RISK';
-      case 'MEDIUM':
-        return 'MEDIUM RISK';
-      case 'LOW':
-        return 'LOW RISK';
-      default:
-        return 'LOW RISK';
-    }
   }
 }

@@ -108,14 +108,14 @@ class ReportRepositoryImpl implements ReportRepository {
         limit: limit,
       );
 
-      final List<dynamic> data = response['data'] ?? [];
+      final List<dynamic> data = response['content'] ?? [];
       final reports = data.map((json) => Report.fromJson(json)).toList();
 
       return PaginatedReports(
         reports: reports,
-        totalCount: response['count'] ?? reports.length,
+        totalCount: response['totalElements'] ?? reports.length,
         currentPage: page,
-        totalPages: (response['count'] ?? reports.length) ~/ limit + 1,
+        totalPages: response['totalPages'] ?? 1,
       );
     } catch (e) {
       throw _handleError(e);

@@ -21,6 +21,10 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
 
     Page<Report> findByHazardTypeAndStatusNot(Report.HazardType hazardType, Report.Status status, Pageable pageable);
 
+    Page<Report> findByStatus(Report.Status status, Pageable pageable);
+
+    Page<Report> findByHazardTypeAndStatus(Report.HazardType hazardType, Report.Status status, Pageable pageable);
+
     @Query(value = """
         SELECT * FROM reports r
         WHERE r.report_status != :rejectedStatus

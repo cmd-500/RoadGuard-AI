@@ -480,14 +480,6 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
             _buildLocationPreview(),
           const SizedBox(height: AppSpacing.xl),
           _buildInfoCard(),
-          const SizedBox(height: AppSpacing.xl),
-          AppPrimaryButton(
-            label: 'Submit Report',
-            leadingIcon: AppIcons.paperPlane,
-            onPressed: _submitReport,
-            isLoading: context.watch<ReportProvider>().isSubmitting,
-            isFullWidth: true,
-          ),
         ],
       ),
     );

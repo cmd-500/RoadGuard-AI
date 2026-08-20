@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:io' show File;
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'dart:html' as html show window, Event;
 import '../../core/design_system/index.dart';
 import '../../shared/components/index.dart';
 
@@ -27,6 +30,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
   XFile? _capturedImage;
   Uint8List? _capturedImageBytes;
   String? _error;
+  Timer? _resizeDebounce;
 
   @override
   void initState() {
@@ -38,8 +42,36 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _resizeDebounce?.cancel();
     _controller?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    // On Flutter Web, Chrome's DevTools "toggle device toolbar" actually
+    // stops the underlying camera hardware track (not just pauses
+    // playback), so resumePreview() alone can't revive it. Once the
+    // resize settles, fully tear down and re-acquire the camera stream.
+    if (!kIsWeb) return;
+    if (!_isInitialized || _controller == null) return;
+
+    _resizeDebounce?.cancel();
+    _resizeDebounce = Timer(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      _reacquireCamera();
+    });
+  }
+
+  Future<void> _reacquireCamera() async {
+    final oldController = _controller;
+    _controller = null;
+    if (mounted) setState(() => _isInitialized = false);
+    try {
+      await oldController?.dispose();
+    } catch (_) {}
+    if (!mounted) return;
+    await _initializeCamera();
   }
 
   @override
@@ -49,6 +81,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
 
     if (state == AppLifecycleState.inactive) {
       controller.dispose();
+      setState(() => _isInitialized = false);
     } else if (state == AppLifecycleState.resumed) {
       _initializeCamera();
     }
@@ -73,6 +106,15 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
 
       if (!mounted) return;
       setState(() => _isInitialized = true);
+
+      if (kIsWeb) {
+        // Chrome only paints the camera's platform view after a layout
+        // pass triggered by a resize (this is why toggling DevTools
+        // "fixes" it). Fire a synthetic resize so it paints immediately
+        // instead of requiring the user to resize the window manually.
+        await Future.delayed(const Duration(milliseconds: 100));
+        html.window.dispatchEvent(html.Event('resize'));
+      }
     } catch (e) {
       setState(() => _error = 'Failed to initialize camera: ${e.toString()}');
     }
@@ -182,12 +224,13 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
     return Stack(
       children: [
         Positioned.fill(
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: _controller!.value.previewSize!.height,
-              height: _controller!.value.previewSize!.width,
-              child: CameraPreview(_controller!),
+          child: Container(
+            color: Colors.black,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: _controller!.value.aspectRatio,
+                child: CameraPreview(_controller!),
+              ),
             ),
           ),
         ),
@@ -209,45 +252,11 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
                   ),
                 ),
               ),
-              _buildCameraTips(),
               _buildCaptureControls(),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCameraTips() {
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.lg),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Photo Guidelines', style: AppTypography.titleSmall),
-          const SizedBox(height: AppSpacing.sm),
-          ...[
-            'Keep the issue in frame',
-            'Capture from proper distance',
-            'Ensure good lighting',
-            'Show surrounding area if possible',
-          ].map((tip) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                child: Row(
-                  children: [
-                    Icon(AppIcons.check, size: 14, color: AppColors.success),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(tip, style: AppTypography.bodySmall),
-                  ],
-                ),
-              )),
-        ],
-      ),
     );
   }
 
@@ -291,16 +300,16 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
                 ),
                 child: _isCapturing
                     ? Center(
-                        child: AppCircularProgress(
-                          color: AppColors.primary,
-                          size: 32,
-                        ),
-                      )
+                  child: AppCircularProgress(
+                    color: AppColors.primary,
+                    size: 32,
+                  ),
+                )
                     : Icon(
-                        AppIcons.camera,
-                        size: 32,
-                        color: AppColors.textPrimary,
-                      ),
+                  AppIcons.camera,
+                  size: 32,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
             AppIconButton(

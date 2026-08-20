@@ -504,15 +504,15 @@ class AppQuickActionCard extends StatelessWidget {
             ),
             child: isLoading
                 ? Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(iconColor),
-                      ),
-                    ),
-                  )
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                ),
+              ),
+            )
                 : Icon(icon, size: 28, color: iconColor),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -782,6 +782,155 @@ class AppMenuCard extends StatelessWidget {
           trailing ?? (onTap != null
               ? Icon(AppIcons.caretRight, size: 20, color: AppColors.textTertiary)
               : const SizedBox.shrink()),
+        ],
+      ),
+    );
+  }
+}
+
+/// Compact list-row for a live/nearby alert — icon, title, meta line,
+/// distance and a chevron on the trailing edge, plus a small risk pill.
+/// Used on the Home screen's "Live Alerts" feed.
+class AppAlertListItem extends StatelessWidget {
+  final String hazardType;
+  final String title;
+  final String subtitle;
+  final String distance;
+  final String severity;
+  final VoidCallback? onTap;
+
+  const AppAlertListItem({
+    super.key,
+    required this.hazardType,
+    required this.title,
+    required this.subtitle,
+    required this.distance,
+    required this.severity,
+    this.onTap,
+  });
+
+  String get _riskLabel {
+    switch (severity.toUpperCase()) {
+      case 'CRITICAL':
+      case 'HIGH':
+        return 'High Risk';
+      case 'MEDIUM':
+        return 'Medium Risk';
+      case 'LOW':
+        return 'Low Risk';
+      default:
+        return 'Info';
+    }
+  }
+
+  IconData get _icon => _resolveIcon(hazardType);
+  Color get _iconColor => AppColors.hazardColor(hazardType);
+  Color get _iconBgColor => AppColors.hazardLightColor(hazardType);
+
+  static IconData _resolveIcon(String type) {
+    switch (type.toUpperCase()) {
+      case 'POTHOLE':
+        return AppIcons.pothole;
+      case 'ACCIDENT':
+        return AppIcons.carCrash;
+      case 'FOG':
+        return AppIcons.cloudFog;
+      case 'SPEED_BREAKER':
+      case 'UNMARKED_BREAKER':
+      case 'ILLEGAL_BREAKER':
+        return AppIcons.speedBump;
+      case 'WATERLOGGING':
+      case 'WATERLOGGED_HAZARD':
+        return AppIcons.waves;
+      case 'ROAD_DAMAGE':
+        return AppIcons.roadHorizon;
+      case 'CONSTRUCTION':
+        return AppIcons.hammer;
+      case 'EMERGENCY':
+        return AppIcons.warningCircle;
+    // Alert categories (Live Alerts feed)
+      case 'ROAD':
+        return AppIcons.roadHorizon;
+      case 'WEATHER':
+        return AppIcons.waves;
+      case 'VISIBILITY':
+        return AppIcons.cloudFog;
+      case 'DISASTER':
+        return AppIcons.warningCircle;
+      default:
+        return AppIcons.warning;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final riskColor = AppColors.severityColor(severity);
+    final riskLightColor = AppColors.severityLightColor(severity);
+
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(AppSpacing.cardPadding),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: _iconBgColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(_icon, size: 20, color: _iconColor),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTypography.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: riskLightColor,
+                    borderRadius: BorderRadius.circular(AppRadius.badge),
+                  ),
+                  child: Text(
+                    _riskLabel.toUpperCase(),
+                    style: AppTypography.overline.copyWith(color: riskColor, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                distance,
+                style: AppTypography.labelMedium.copyWith(
+                  color: riskColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Icon(AppIcons.caretRight, size: 16, color: AppColors.textTertiary),
+            ],
+          ),
         ],
       ),
     );

@@ -136,9 +136,9 @@ public class ReportService {
     public Page<ReportDtos.Response> getReports(Report.Status status, Report.HazardType hazardType, Pageable pageable) {
         Page<Report> reports;
         if (status != null && hazardType != null) {
-            reports = reportRepository.findByHazardTypeAndStatusNot(hazardType, status, pageable);
+            reports = reportRepository.findByHazardTypeAndStatus(hazardType, status, pageable);
         } else if (status != null) {
-            reports = reportRepository.findByStatusNot(status, pageable);
+            reports = reportRepository.findByStatus(status, pageable);
         } else {
             reports = reportRepository.findAll(pageable);
         }

@@ -165,6 +165,11 @@ class AppColors {
     'CONSTRUCTION': Color(0xFF7C3AED),
     'EMERGENCY': Color(0xFFDC2626),
     'OTHER': Color(0xFF64748B),
+    // Alert categories (Live Alerts feed, grouped rather than per hazard type)
+    'ROAD': Color(0xFFEA580C),
+    'WEATHER': Color(0xFF0891B2),
+    'VISIBILITY': Color(0xFF2563EB),
+    'DISASTER': Color(0xFF7C3AED),
   };
 
   static const Map<String, Color> hazardLightColors = {
@@ -180,6 +185,10 @@ class AppColors {
     'CONSTRUCTION': Color(0xFFEDE9FE),
     'EMERGENCY': Color(0xFFFEE2E2),
     'OTHER': Color(0xFFF1F5F9),
+    'ROAD': Color(0xFFFFEDD5),
+    'WEATHER': Color(0xFFCFFAFE),
+    'VISIBILITY': Color(0xFFDBEAFE),
+    'DISASTER': Color(0xFFEDE9FE),
   };
 
   // Severity Colors
