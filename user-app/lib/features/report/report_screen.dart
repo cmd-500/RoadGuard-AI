@@ -10,6 +10,8 @@ import '../../shared/providers/report_provider.dart';
 import '../../shared/providers/location_provider.dart';
 import '../../services/report_service.dart';
 import 'camera_capture_screen.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -24,7 +26,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   final List<String> _steps = ['Issue Details', 'Add Photo', 'Review'];
 
   HazardType? _selectedHazardType;
-  Severity _selectedSeverity = Severity.medium;
+  Severity? _selectedSeverity;
   String _selectedWhen = 'Just now';
   final TextEditingController _detailsController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -471,7 +473,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
           ),
           const SizedBox(height: AppSpacing.xl),
           _buildReviewSection('Issue Type', _selectedHazardType?.name.replaceAll('_', ' ').toUpperCase() ?? 'Not selected'),
-          _buildReviewSection('Severity', _selectedSeverity.name.toUpperCase()),
+          _buildReviewSection('Severity', _selectedSeverity?.name.toUpperCase() ?? 'Not selected'),
           _buildReviewSection('Location', _locationController.text.isNotEmpty ? _locationController.text : 'Not set'),
           _buildReviewSection('Reported On', _selectedWhen),
           _buildReviewSection('Details', _detailsController.text.isNotEmpty ? _detailsController.text : 'No details provided'),
@@ -526,26 +528,56 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
         children: [
           Text('Location Preview', style: AppTypography.titleMedium),
           const SizedBox(height: AppSpacing.md),
-          Container(
-            height: 150,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(AppIcons.mapPin, size: 48, color: AppColors.textTertiary),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Map Preview\n${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}',
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-                    textAlign: TextAlign.center,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            child: SizedBox(
+              height: 150,
+              child: IgnorePointer(
+                // Read-only preview here; full interaction happens on the
+                // location step (step 0), so we don't want pan/zoom
+                // gestures fighting the review page's scroll view.
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(
+                      _selectedLocation!.latitude,
+                      _selectedLocation!.longitude,
+                    ),
+                    initialZoom: 15,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.none,
+                    ),
                   ),
-                ],
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.roadsafes.app',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: LatLng(
+                            _selectedLocation!.latitude,
+                            _selectedLocation!.longitude,
+                          ),
+                          width: 40,
+                          height: 40,
+                          child: Icon(
+                            AppIcons.mapPin,
+                            size: 36,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}',
+            style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -573,7 +605,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   }
 
   Future<void> _submitReport() async {
-    if (_selectedHazardType == null || _selectedLocation == null) {
+    if (_selectedHazardType == null || _selectedLocation == null || _selectedSeverity == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please select issue type and ensure location is set', style: AppTypography.bodyMedium),
@@ -600,7 +632,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
         description: _detailsController.text,
         address: _locationController.text,
         hazardType: _selectedHazardType!.toBackendName(),
-        severity: _selectedSeverity.toBackendName(),
+        severity: _selectedSeverity!.toBackendName(),
         latitude: _selectedLocation!.latitude,
         longitude: _selectedLocation!.longitude,
         imageFile: imageBytes,
@@ -636,7 +668,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
     setState(() {
       _currentStep = 0;
       _selectedHazardType = null;
-      _selectedSeverity = Severity.medium;
+      _selectedSeverity = null;
       _selectedWhen = 'Just now';
       _detailsController.clear();
       _selectedLocation = null;
@@ -682,7 +714,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                 label: _currentStep == 2 ? 'Submit Report' : 'Next',
                 trailingIcon: _currentStep == 2 ? null : AppIcons.forward,
                 onPressed: _currentStep == 0
-                    ? (_selectedHazardType != null && _selectedLocation != null
+                    ? (_selectedHazardType != null && _selectedLocation != null && _selectedSeverity != null
                     ? () {
                   setState(() => _currentStep++);
                   _pageController.nextPage(
