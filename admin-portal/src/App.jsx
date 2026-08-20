@@ -9,13 +9,13 @@ const API_BASE = "http://localhost:8080/api/v1";
 function typeFromBackend(type) {
   const map = {
     POTHOLE: "pothole",
-    ACCIDENT: "crack",
+    ACCIDENT: "accident",
     WATERLOGGING: "waterlogging",
     SPEED_BREAKER: "speed breaker",
     FOG: "fog",
     CONSTRUCTION: "landslide",
     EMERGENCY: "cyclone",
-    OTHER: "crack",
+    OTHER: "other",
   };
   return map[type] || type.toLowerCase();
 }
@@ -23,7 +23,7 @@ function typeFromBackend(type) {
 function typeToBackend(type) {
   const map = {
     pothole: "POTHOLE",
-    crack: "ACCIDENT",
+    accident: "ACCIDENT",
     waterlogging: "WATERLOGGING",
     "speed breaker": "SPEED_BREAKER",
     fog: "FOG",
@@ -69,18 +69,25 @@ function getIconConfig(type) {
       text: "text-red-600",
       border: "border-red-200",
       svg: (
+          // Pothole: circular crater with cracked rim
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <ellipse cx="12" cy="13" rx="7" ry="4.5" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10.5l1.5 2M15 10l-1.2 2.3M11 15.5l1-2" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.5 6.5l2 1.5M20.5 6.5l-2 1.5" />
           </svg>
       ),
     },
-    crack: {
+    accident: {
       bg: "bg-amber-100",
       text: "text-amber-600",
       border: "border-amber-200",
       svg: (
+          // Accident: car with impact burst
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16v-2.5L5 9h9l3 4.5V16M3 16h14M3 16v2M17 16v2" />
+            <circle cx="6.5" cy="16.5" r="1.5" strokeWidth={2} />
+            <circle cx="14.5" cy="16.5" r="1.5" strokeWidth={2} />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.5 4l1.5 2-1.5 2M21 6h-4" />
           </svg>
       ),
     },
@@ -89,8 +96,11 @@ function getIconConfig(type) {
       text: "text-blue-600",
       border: "border-blue-200",
       svg: (
+          // Waterlogging: stacked waves
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 14c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 19c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0" />
           </svg>
       ),
     },
@@ -99,8 +109,10 @@ function getIconConfig(type) {
       text: "text-purple-600",
       border: "border-purple-200",
       svg: (
+          // Speed breaker: raised hump on road
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 17c2-4 5-6 10-6s8 2 10 6" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} strokeDasharray="2 2" d="M4 20h16" />
           </svg>
       ),
     },
@@ -109,8 +121,10 @@ function getIconConfig(type) {
       text: "text-slate-600",
       border: "border-slate-200",
       svg: (
+          // Fog: horizontal haze lines with sun peeking
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <circle cx="12" cy="7" r="2.5" strokeWidth={2} />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h18M4 16h16M6 20h12" />
           </svg>
       ),
     },
@@ -119,8 +133,10 @@ function getIconConfig(type) {
       text: "text-orange-600",
       border: "border-orange-200",
       svg: (
+          // Construction/landslide: mountain with falling debris
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 19l5-9 3.5 5L15 9l6 10H3z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 4l1 1.5M20 5l-1 1.5" />
           </svg>
       ),
     },
@@ -129,13 +145,27 @@ function getIconConfig(type) {
       text: "text-indigo-600",
       border: "border-indigo-200",
       svg: (
+          // Emergency/cyclone: spiral
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3a9 9 0 109 9M12 3a5 5 0 105 5M12 3a1.5 1.5 0 101.5 1.5" />
+          </svg>
+      ),
+    },
+    other: {
+      bg: "bg-teal-100",
+      text: "text-teal-600",
+      border: "border-teal-200",
+      svg: (
+          // Other: generic warning triangle
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4l9 16H3l9-16z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v4" />
+            <circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none" />
           </svg>
       ),
     },
   };
-  return configs[type] || configs.pothole;
+  return configs[type] || configs.other;
 }
 
 export default function App() {

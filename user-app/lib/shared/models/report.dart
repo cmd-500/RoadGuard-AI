@@ -192,8 +192,10 @@ class Report {
       voteScore: json['voteScore'] ?? 0,
       upvoteCount: json['upvoteCount'] ?? 0,
       downvoteCount: json['downvoteCount'] ?? 0,
-      createdBy: json['createdBy'] ?? '',
-      creator: json['createdBy'] != null ? UserSummary.fromJson(json['createdBy']) : null,
+      createdBy: json['createdBy'] is Map
+          ? (json['createdBy']['id'] ?? '')
+          : (json['createdBy'] ?? ''),
+      creator: json['createdBy'] is Map ? UserSummary.fromJson(json['createdBy']) : null,
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : DateTime.now(),
     );

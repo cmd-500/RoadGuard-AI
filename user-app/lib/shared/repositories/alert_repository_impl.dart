@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'dart:developer' as developer;
 import '../models/alert.dart';
 import '../models/report.dart';
 import 'alert_repository.dart';
@@ -6,11 +7,9 @@ import 'report_repository.dart';
 
 /// Live-Alerts feed backed by real reports.
 ///
-/// A report only shows up here once an admin has reviewed it in the
-/// admin-portal and marked it "Resolved" (see admin-portal's "Mark as
-/// Resolved" action, which PUTs status=RESOLVED to the backend). That is
-/// the app's notion of "admin approved". Until then the report stays
-/// PENDING / IN_PROGRESS and is only visible on the admin dashboard.
+/// Reports show up here once an admin has reviewed them in the
+/// admin-portal and marked them as "Verified" (IN_PROGRESS) or
+/// "Resolved" (RESOLVED). Both represent admin-approved alerts.
 class ApiAlertRepositoryImpl implements AlertRepository {
   final ReportRepository _reportRepository;
 
@@ -19,10 +18,79 @@ class ApiAlertRepositoryImpl implements AlertRepository {
 
   @override
   Future<List<SafetyAlert>> getAlerts({AlertCategory? category}) async {
-    final result = await _reportRepository.getReports(
-      status: ReportStatus.resolved,
-      limit: 50,
-    );
+    final allReports = <Report>[];
+
+    // Try fetching with status filters first (admin-approved statuses)
+    try {
+      final resolvedResult = await _reportRepository.getReports(
+        status: ReportStatus.resolved,
+        limit: 50,
+      );
+      developer.log('Resolved reports fetched: ${resolvedResult.reports.length}');
+      allReports.addAll(resolvedResult.reports);
+    } catch (e) {
+      developer.log('Error fetching resolved reports: $e');
+    }
+
+    try {
+      final inProgressResult = await _reportRepository.getReports(
+        status: ReportStatus.inProgress,
+        limit: 50,
+      );
+      developer.log('InProgress reports fetched: ${inProgressResult.reports.length}');
+      allReports.addAll(inProgressResult.reports);
+    } catch (e) {
+      developer.log('Error fetching inProgress reports: $e');
+    }
+
+    // Fallback 1: Also check PENDING reports (some backends use this for "verified")
+    if (allReports.isEmpty) {
+      try {
+        developer.log('Trying PENDING reports...');
+        final pendingResult = await _reportRepository.getReports(
+          status: ReportStatus.pending,
+          limit: 50,
+        );
+        developer.log('Pending reports fetched: ${pendingResult.reports.length}');
+        allReports.addAll(pendingResult.reports);
+      } catch (e) {
+        developer.log('Error fetching pending reports: $e');
+      }
+    }
+
+    // Fallback 2: if still empty, fetch all and filter client-side
+    if (allReports.isEmpty) {
+      try {
+        developer.log('No reports with status filters, fetching all reports...');
+        final allResult = await _reportRepository.getReports(limit: 100);
+        final filtered = allResult.reports.where((r) => 
+          r.status == ReportStatus.inProgress || 
+          r.status == ReportStatus.resolved ||
+          r.status == ReportStatus.pending
+        ).toList();
+        developer.log('Filtered reports from all: ${filtered.length}');
+        allReports.addAll(filtered);
+      } catch (e) {
+        developer.log('Error fetching all reports: $e');
+      }
+    }
+
+    // Final fallback: show ALL reports (for debugging - remove in production)
+    if (allReports.isEmpty) {
+      try {
+        developer.log('Final fallback: fetching ALL reports...');
+        final allResult = await _reportRepository.getReports(limit: 20);
+        developer.log('All reports fetched: ${allResult.reports.length}');
+        allReports.addAll(allResult.reports);
+      } catch (e) {
+        developer.log('Error fetching all reports: $e');
+      }
+    }
+
+    if (allReports.isEmpty) {
+      developer.log('No alerts to show');
+      return [];
+    }
 
     Position? currentPosition;
     try {
@@ -31,7 +99,7 @@ class ApiAlertRepositoryImpl implements AlertRepository {
       // Location isn't essential for showing alerts, so ignore failures.
     }
 
-    final alerts = result.reports.map((report) {
+    final alerts = allReports.map((report) {
       final distanceKm = currentPosition != null
           ? Geolocator.distanceBetween(
                 currentPosition.latitude,

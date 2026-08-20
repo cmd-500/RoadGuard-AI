@@ -45,6 +45,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       backgroundColor: AppColors.background,
       appBar: AppAppBar(
         title: 'Profile',
+        centerTitle: false,
+        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(AppIcons.settings, size: 24),
@@ -55,32 +57,38 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       ),
       body: FadeTransition(
         opacity: _fadeAnimation,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            children: [
-              _buildProfileHeader(user),
-              const SizedBox(height: AppSpacing.xl),
-              _buildStats(user),
-              const SizedBox(height: AppSpacing.xl),
-              _buildBadges(user),
-              const SizedBox(height: AppSpacing.xl),
-              _buildMainCTA(),
-              const SizedBox(height: AppSpacing.xl),
-              _buildMenuSections(),
-              const SizedBox(height: AppSpacing.xl),
-              _buildActions(),
-              const SizedBox(height: AppSpacing.xxxxl),
-            ],
-          ),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                child: Column(
+                  children: [
+                    _buildProfileHeader(user),
+                    const SizedBox(height: AppSpacing.xl),
+                    _buildStats(user),
+                    const SizedBox(height: AppSpacing.xl),
+                    _buildBadges(user),
+                    const SizedBox(height: AppSpacing.xl),
+                    _buildMainCTA(),
+                    const SizedBox(height: AppSpacing.xl),
+                    _buildMenuSections(),
+                    const SizedBox(height: AppSpacing.xl),
+                    _buildActions(),
+                    const SizedBox(height: AppSpacing.xxxxl),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildProfileHeader(User? user) {
-    return AppGradientCard(
-      gradient: AppColors.primaryGradient,
+    return AppGlassCard(
+      isDark: false,
       padding: const EdgeInsets.all(AppSpacing.xxl),
       borderRadius: BorderRadius.circular(AppRadius.xxl),
       child: Column(
@@ -89,10 +97,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             children: [
               CircleAvatar(
                 radius: 56,
-                backgroundColor: AppColors.onPrimary.withValues(alpha: 0.2),
+                backgroundColor: AppColors.primaryContainer,
                 backgroundImage: user?.avatarUrl != null ? NetworkImage(user!.avatarUrl!) : null,
                 child: user?.avatarUrl == null
-                    ? Icon(AppIcons.user, size: 56, color: AppColors.onPrimary.withValues(alpha: 0.6))
+                    ? Icon(AppIcons.user, size: 56, color: AppColors.primary)
                     : null,
               ),
               if (user?.isTrusted == true)
@@ -104,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     decoration: BoxDecoration(
                       color: AppColors.warning,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.onPrimary, width: 3),
+                      border: Border.all(color: AppColors.surface, width: 3),
                     ),
                     child: Icon(AppIcons.star, size: 16, color: AppColors.onPrimary),
                   ),
@@ -114,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           const SizedBox(height: AppSpacing.lg),
           Text(
             user?.name ?? 'User',
-            style: AppTypography.headlineMedium.copyWith(color: AppColors.onPrimary),
+            style: AppTypography.headlineMedium,
           ),
           const SizedBox(height: AppSpacing.xs),
           Container(
@@ -123,12 +131,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               vertical: AppSpacing.xs,
             ),
             decoration: BoxDecoration(
-              color: AppColors.onPrimary.withValues(alpha: 0.2),
+              color: AppColors.primaryContainer,
               borderRadius: BorderRadius.circular(AppRadius.round),
             ),
             child: Text(
               user?.roleDisplay ?? 'Citizen',
-              style: AppTypography.labelSmall.copyWith(color: AppColors.onPrimary),
+              style: AppTypography.labelSmall.copyWith(color: AppColors.primary),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -136,11 +144,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(AppIcons.mapPin, size: 16, color: AppColors.onPrimary.withValues(alpha: 0.8)),
+                Icon(AppIcons.mapPin, size: 16, color: AppColors.textSecondary),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   user!.location!,
-                  style: AppTypography.bodySmall.copyWith(color: AppColors.onPrimary.withValues(alpha: 0.8)),
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -153,17 +161,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 vertical: AppSpacing.sm,
               ),
               decoration: BoxDecoration(
-                color: AppColors.onPrimary.withValues(alpha: 0.2),
+                color: AppColors.successLight,
                 borderRadius: BorderRadius.circular(AppRadius.round),
+                border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(AppIcons.shieldCheck, size: 14, color: AppColors.onPrimary),
+                  Icon(AppIcons.shieldCheck, size: 14, color: AppColors.success),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Trusted Reporter • ${user!.trustScore} Trust Score',
-                    style: AppTypography.labelMedium.copyWith(color: AppColors.onPrimary),
+                    style: AppTypography.labelMedium.copyWith(color: AppColors.success),
                   ),
                 ],
               ),
@@ -174,10 +183,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   }
 
   Widget _buildStats(User? user) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppStatCard(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 520;
+        final cards = [
+          AppStatCard(
             label: 'Reports Submitted',
             value: '${user?.reportsSubmitted ?? 0}',
             icon: AppIcons.flag,
@@ -185,10 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             backgroundColor: AppColors.primaryContainer,
             onTap: () {},
           ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: AppStatCard(
+          AppStatCard(
             label: 'Issues Resolved',
             value: '${user?.reportsConfirmed ?? 0}',
             icon: AppIcons.checkCircle,
@@ -196,8 +203,37 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             backgroundColor: AppColors.successLight,
             onTap: () {},
           ),
-        ),
-      ],
+          AppStatCard(
+            label: 'Trust Score',
+            value: '${user?.trustScore ?? 0}',
+            icon: AppIcons.star,
+            iconColor: AppColors.warning,
+            backgroundColor: AppColors.warningLight,
+            onTap: () {},
+          ),
+        ];
+
+        if (isNarrow) {
+          return Column(
+            children: cards
+                .map((card) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: SizedBox(width: double.infinity, child: card),
+                    ))
+                .toList(),
+          );
+        }
+
+        return Row(
+          children: cards
+              .expand((card) => [
+                    Expanded(child: card),
+                    const SizedBox(width: AppSpacing.md),
+                  ])
+              .take(5)
+              .toList(),
+        );
+      },
     );
   }
 
@@ -220,11 +256,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         ),
         const SizedBox(height: AppSpacing.md),
         SizedBox(
-          height: 100,
+          height: 110,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: badges.length,
-            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.lg),
+            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
             itemBuilder: (context, index) => _buildBadgeItem(badges[index]),
           ),
         ),
@@ -237,28 +273,31 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     final background = badge.unlocked ? AppColors.primaryContainer : AppColors.surfaceContainerLow;
 
     return SizedBox(
-      width: 76,
+      width: 80,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
               color: background,
               shape: BoxShape.circle,
               border: badge.unlocked ? null : Border.all(color: AppColors.outline, width: 1.5),
               boxShadow: badge.unlocked ? AppShadows.primaryGlowSubtle : null,
             ),
-            child: Icon(badge.icon, size: 30, color: color),
+            child: Icon(badge.icon, size: 32, color: color),
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            badge.title,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: AppTypography.labelSmall.copyWith(
-              color: badge.unlocked ? AppColors.textPrimary : AppColors.textTertiary,
+          const SizedBox(height: AppSpacing.sm),
+          Flexible(
+            child: Text(
+              badge.title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.labelSmall.copyWith(
+                color: badge.unlocked ? AppColors.textPrimary : AppColors.textTertiary,
+              ),
             ),
           ),
         ],
@@ -281,11 +320,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   }
 
   Widget _buildMainCTA() {
-    return AppGradientCard(
-      gradient: AppColors.primaryGradient,
+    return AppGlassCard(
       padding: const EdgeInsets.all(AppSpacing.xl),
       borderRadius: BorderRadius.circular(AppRadius.xl),
-      shadows: AppShadows.cardElevated,
+      borderColor: AppColors.primary,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -294,10 +332,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.onPrimary.withValues(alpha: 0.2),
+                  color: AppColors.primaryContainer,
                   borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
-                child: Icon(AppIcons.flag, size: 28, color: AppColors.onPrimary),
+                child: Icon(AppIcons.flag, size: 28, color: AppColors.primary),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
@@ -306,12 +344,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   children: [
                     Text(
                       'Make Roads Safer',
-                      style: AppTypography.headlineSmall.copyWith(color: AppColors.onPrimary),
+                      style: AppTypography.headlineSmall,
                     ),
                     Text(
                       'Report issues. Help your community.',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.onPrimary.withValues(alpha: 0.9),
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -320,11 +358,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          AppSecondaryButton(
+          AppPrimaryButton(
             label: 'Report an Issue',
             isFullWidth: true,
-            borderColor: AppColors.onPrimary,
-            textColor: AppColors.onPrimary,
             onPressed: () {},
           ),
         ],
@@ -342,24 +378,32 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             title: 'My Profile',
             subtitle: 'Manage your account',
             onTap: () {},
+            iconBgColor: AppColors.primaryContainer,
+            iconColor: AppColors.primary,
           ),
           _ProfileMenuItem(
             icon: AppIcons.flag,
             title: 'My Reports',
             subtitle: 'View submitted reports',
             onTap: () {},
+            iconBgColor: AppColors.infoLight,
+            iconColor: AppColors.info,
           ),
           _ProfileMenuItem(
             icon: AppIcons.heart,
             title: 'Favorites',
             subtitle: 'Saved locations & routes',
             onTap: () {},
+            iconBgColor: AppColors.successLight,
+            iconColor: AppColors.success,
           ),
           _ProfileMenuItem(
             icon: AppIcons.bell,
             title: 'Notifications',
             subtitle: 'Alert preferences',
             onTap: () {},
+            iconBgColor: AppColors.warningLight,
+            iconColor: AppColors.warning,
           ),
         ],
       ),
@@ -371,6 +415,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             title: 'Safety Tips',
             subtitle: 'Road safety guidelines',
             onTap: () {},
+            iconBgColor: AppColors.errorLight,
+            iconColor: AppColors.error,
           ),
         ],
       ),
@@ -382,18 +428,21 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             title: 'About',
             subtitle: 'Version 1.0.0',
             onTap: () {},
+            iconBgColor: AppColors.surfaceContainerLow,
+            iconColor: AppColors.textSecondary,
           ),
         ],
       ),
     ];
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: sections.map((section) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (section.title.isNotEmpty) ...[
             Padding(
-              padding: const EdgeInsets.only(left: AppSpacing.sm, bottom: AppSpacing.sm),
+              padding: const EdgeInsets.only(left: AppSpacing.sm, bottom: AppSpacing.sm, top: AppSpacing.xs),
               child: Text(
                 section.title,
                 style: AppTypography.labelSmall.copyWith(
@@ -403,42 +452,70 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ),
             ),
           ],
-          ...section.items.map((item) => _buildMenuItem(item)),
+          ...section.items.map((item) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: _buildMenuItem(item),
+          )),
+          const SizedBox(height: AppSpacing.md),
         ],
       )).toList(),
     );
   }
 
   Widget _buildMenuItem(_ProfileMenuItem item) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: AppMenuCard(
-        title: item.title,
-        subtitle: item.subtitle,
-        icon: item.icon,
-        iconBackgroundColor: AppColors.primaryContainer,
-        iconColor: AppColors.primary,
-        onTap: item.onTap,
+    return AppCard(
+      onTap: item.onTap,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      isHoverable: true,
+      isPressable: true,
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: item.iconBgColor,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+            ),
+            child: Icon(item.icon, size: 22, color: item.iconColor),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item.title, style: AppTypography.titleMedium),
+                if (item.subtitle != null)
+                  Text(
+                    item.subtitle!,
+                    style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                  ),
+              ],
+            ),
+          ),
+          Icon(AppIcons.caretRight, size: 20, color: AppColors.textTertiary),
+        ],
       ),
     );
   }
 
   Widget _buildActions() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppSecondaryButton(
+        AppPrimaryButton(
           label: 'Share App',
           leadingIcon: AppIcons.share,
           isFullWidth: true,
           onPressed: () {},
         ),
         const SizedBox(height: AppSpacing.md),
-        AppTertiaryButton(
+        AppSecondaryButton(
           label: 'Logout',
           leadingIcon: AppIcons.signOut,
           textColor: AppColors.error,
-          onPressed: () => _showLogoutDialog(),
           isFullWidth: true,
+          onPressed: () => _showLogoutDialog(),
         ),
       ],
     );
@@ -494,11 +571,15 @@ class _ProfileMenuItem {
   final String title;
   final String? subtitle;
   final VoidCallback onTap;
+  final Color iconBgColor;
+  final Color iconColor;
 
   _ProfileMenuItem({
     required this.icon,
     required this.title,
     this.subtitle,
     required this.onTap,
+    required this.iconBgColor,
+    required this.iconColor,
   });
 }

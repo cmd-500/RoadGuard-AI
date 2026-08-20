@@ -464,7 +464,7 @@ class AppSafetyAlertCard extends StatelessWidget {
   }
 }
 
-/// Quick action card for home screen
+/// Quick action card for home screen - responsive
 class AppQuickActionCard extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -487,52 +487,71 @@ class AppQuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      onTap: onTap,
-      isHoverable: true,
-      isPressable: true,
-      padding: const EdgeInsets.all(AppSpacing.cardPadding),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: iconBackgroundColor,
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-            ),
-            child: isLoading
-                ? Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 80;
+        final iconSize = isCompact ? 40.0 : 48.0;
+        final iconInnerSize = isCompact ? 18.0 : 22.0;
+        final titleStyle = isCompact ? AppTypography.labelSmall : AppTypography.titleSmall;
+        final subtitleStyle = isCompact 
+            ? AppTypography.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 9)
+            : AppTypography.bodySmall.copyWith(color: AppColors.textSecondary);
+        final padding = isCompact ? AppSpacing.xs : AppSpacing.sm;
+        final spacing = isCompact ? AppSpacing.xs : AppSpacing.sm;
+
+        return AppCard(
+          onTap: onTap,
+          isHoverable: true,
+          isPressable: true,
+          padding: EdgeInsets.all(padding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: iconSize,
+                height: iconSize,
+                decoration: BoxDecoration(
+                  color: iconBackgroundColor,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                ),
+                child: isLoading
+                    ? Center(
+                  child: SizedBox(
+                    width: iconInnerSize,
+                    height: iconInnerSize,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                    ),
+                  ),
+                )
+                    : Icon(icon, size: iconInnerSize, color: iconColor),
+              ),
+              SizedBox(height: spacing),
+              Flexible(
+                child: Text(
+                  title,
+                  style: titleStyle,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            )
-                : Icon(icon, size: 28, color: iconColor),
+              SizedBox(height: spacing / 2),
+              Flexible(
+                child: Text(
+                  subtitle,
+                  style: subtitleStyle,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            title,
-            style: AppTypography.titleSmall,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            subtitle,
-            style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

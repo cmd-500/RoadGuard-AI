@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -29,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
+  Timer? _alertPollTimer;
+
   @override
   void initState() {
     super.initState();
@@ -45,9 +48,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LocationProvider>().getCurrentLocation();
       context.read<ReportProvider>().fetchReports();
-      // Live Alerts are reports the admin-portal has reviewed and marked
-      // "Resolved" — see ApiAlertRepositoryImpl for how that's derived.
       context.read<AlertProvider>().fetchAlerts();
+    });
+
+    // Poll for alerts every 30 seconds
+    _alertPollTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) context.read<AlertProvider>().fetchAlerts();
     });
   }
 
@@ -55,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void dispose() {
     _homeMapController.dispose();
     _animationController.dispose();
+    _alertPollTimer?.cancel();
     super.dispose();
   }
 
@@ -121,26 +128,32 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSearchField(),
-                      const SizedBox(height: AppSpacing.xxl),
-                      _buildMapPreview(locationProvider),
-                      const SizedBox(height: AppSpacing.xxl),
-                      _buildQuickActions(),
-                      const SizedBox(height: AppSpacing.xxl),
-                      _buildNearbyAlerts(),
-                    ],
+          child: RefreshIndicator(
+            onRefresh: () => context.read<AlertProvider>().fetchAlerts(),
+            color: AppColors.primary,
+            backgroundColor: AppColors.surface,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSearchField(),
+                        const SizedBox(height: AppSpacing.xxl),
+                        _buildMapPreview(locationProvider),
+                        const SizedBox(height: AppSpacing.xxl),
+                        _buildQuickActions(),
+                        const SizedBox(height: AppSpacing.xxl),
+                        _buildNearbyAlerts(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -346,47 +359,63 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       children: <Widget>[
         Text('Quick Actions', style: AppTypography.headlineSmall),
         const SizedBox(height: AppSpacing.lg),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: AppSpacing.md,
-          mainAxisSpacing: AppSpacing.md,
-          childAspectRatio: 0.98,
-          children: <Widget>[
-            AppQuickActionCard(
-              title: 'Real-time Alerts',
-              subtitle: 'Stay informed',
-              icon: AppIcons.alerts,
-              iconBackgroundColor: AppColors.infoLight,
-              iconColor: AppColors.info,
-              onTap: () => _changeTab(AppTab.alerts),
-            ),
-            AppQuickActionCard(
-              title: 'Report Issue',
-              subtitle: 'Help others',
-              icon: AppIcons.camera,
-              iconBackgroundColor: AppColors.successLight,
-              iconColor: AppColors.success,
-              onTap: () => _changeTab(AppTab.report),
-            ),
-            AppQuickActionCard(
-              title: 'Plan Your Trip',
-              subtitle: 'Safe route',
-              icon: AppIcons.map,
-              iconBackgroundColor: AppColors.primaryContainer,
-              iconColor: AppColors.primary,
-              onTap: () => _changeTab(AppTab.map),
-            ),
-            AppQuickActionCard(
-              title: 'Rewards',
-              subtitle: 'Earn & Redeem',
-              icon: AppIcons.gift,
-              iconBackgroundColor: AppColors.warningLight,
-              iconColor: AppColors.warning,
-              onTap: () {},
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final maxWidth = constraints.maxWidth;
+            final cardWidth = (maxWidth - (3 * AppSpacing.sm)) / 4;
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  width: cardWidth,
+                  child: AppQuickActionCard(
+                    title: 'Live Alerts',
+                    subtitle: 'Stay informed',
+                    icon: AppIcons.alerts,
+                    iconBackgroundColor: AppColors.infoLight,
+                    iconColor: AppColors.info,
+                    onTap: () => _changeTab(AppTab.alerts),
+                  ),
+                ),
+                SizedBox(width: AppSpacing.sm),
+                SizedBox(
+                  width: cardWidth,
+                  child: AppQuickActionCard(
+                    title: 'Report Issue',
+                    subtitle: 'Help others',
+                    icon: AppIcons.camera,
+                    iconBackgroundColor: AppColors.successLight,
+                    iconColor: AppColors.success,
+                    onTap: () => _changeTab(AppTab.report),
+                  ),
+                ),
+                SizedBox(width: AppSpacing.sm),
+                SizedBox(
+                  width: cardWidth,
+                  child: AppQuickActionCard(
+                    title: 'Plan Trip',
+                    subtitle: 'Safe route',
+                    icon: AppIcons.map,
+                    iconBackgroundColor: AppColors.primaryContainer,
+                    iconColor: AppColors.primary,
+                    onTap: () => _changeTab(AppTab.map),
+                  ),
+                ),
+                SizedBox(width: AppSpacing.sm),
+                SizedBox(
+                  width: cardWidth,
+                  child: AppQuickActionCard(
+                    title: 'Rewards',
+                    subtitle: 'Earn & Redeem',
+                    icon: AppIcons.gift,
+                    iconBackgroundColor: AppColors.warningLight,
+                    iconColor: AppColors.warning,
+                    onTap: () {},
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ],
     );

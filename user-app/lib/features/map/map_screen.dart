@@ -247,6 +247,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
   }
 
   Widget _buildBottomSheet(ReportProvider provider) {
+    final filteredReports = provider.nearbyReports.where(_filterMatches).toList();
     return DraggableScrollableSheet(
       initialChildSize: 0.22,
       minChildSize: 0.12,
@@ -261,6 +262,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
             boxShadow: AppShadows.bottomSheet,
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: 40,
@@ -286,8 +288,8 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
                   ],
                 ),
               ),
-              Expanded(
-                child: provider.nearbyReports.isEmpty
+              Flexible(
+                child: filteredReports.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -303,11 +305,15 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
                       )
                     : ListView.separated(
                         controller: scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-                        itemCount: provider.nearbyReports.where(_filterMatches).length,
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.screenPadding,
+                          0,
+                          AppSpacing.screenPadding,
+                          AppSpacing.xl,
+                        ),
+                        itemCount: filteredReports.length,
                         separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
                         itemBuilder: (context, index) {
-                          final filteredReports = provider.nearbyReports.where(_filterMatches).toList();
                           final report = filteredReports[index];
                           return _buildBottomSheetAlert(report);
                         },
@@ -354,7 +360,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
 
   Widget _buildMapControls() {
     return Positioned(
-      bottom: AppSpacing.xxl,
+      bottom: 120, // Account for bottom sheet min height
       right: AppSpacing.screenPadding,
       child: Column(
         children: [
