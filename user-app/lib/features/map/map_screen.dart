@@ -342,7 +342,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  report.hazardType.name.replaceAll('_', ' ').toUpperCase(),
+                  report.hazardType.displayName.toUpperCase(),
                   style: AppTypography.titleSmall,
                 ),
                 Text(
@@ -522,7 +522,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                report.hazardType.name.replaceAll('_', ' ').toUpperCase(),
+                                report.hazardType.displayName.toUpperCase(),
                                 style: AppTypography.titleMedium,
                               ),
                               Text(

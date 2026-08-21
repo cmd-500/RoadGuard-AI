@@ -3,6 +3,13 @@ import '../../core/design_system/index.dart';
 import 'icons.dart';
 import 'badges.dart';
 
+/// Normalizes a hazard type string (camelCase, snake_case, spaced, etc.)
+/// into a consistent key like 'ROADDAMAGE' so icon/color lookups work
+/// no matter which format the caller passes in.
+String normalizeHazardKey(String s) {
+  return s.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+}
+
 class AppHazardIcon extends StatelessWidget {
   final String hazardType;
   final AppHazardIconSize size;
@@ -69,25 +76,33 @@ class AppHazardIcon extends StatelessWidget {
   }
 
   IconData _getHazardIcon(String type) {
-    switch (type.toUpperCase()) {
+    switch (normalizeHazardKey(type)) {
       case 'POTHOLE':
         return AppIcons.pothole;
       case 'ACCIDENT':
         return AppIcons.carCrash;
       case 'FOG':
         return AppIcons.cloudFog;
-      case 'SPEED_BREAKER':
-      case 'UNMARKED_BREAKER':
-      case 'ILLEGAL_BREAKER':
+      case 'SPEEDBREAKER':
+      case 'UNMARKEDBREAKER':
+      case 'ILLEGALBREAKER':
         return AppIcons.speedBump;
       case 'WATERLOGGING':
-      case 'WATERLOGGED_HAZARD':
+      case 'WATERLOGGEDHAZARD':
         return AppIcons.waves;
-      case 'ROAD_DAMAGE':
+      case 'ROADDAMAGE':
         return AppIcons.roadHorizon;
       case 'CONSTRUCTION':
         return AppIcons.hammer;
       case 'EMERGENCY':
+        return AppIcons.warningCircle;
+      case 'ROAD':
+        return AppIcons.roadHorizon;
+      case 'WEATHER':
+        return AppIcons.waves;
+      case 'VISIBILITY':
+        return AppIcons.cloudFog;
+      case 'DISASTER':
         return AppIcons.warningCircle;
       default:
         return AppIcons.warning;
@@ -266,32 +281,46 @@ class AppHazardChip extends StatelessWidget {
   }
 
   String _formatHazardType(String type) {
-    return type
-        .split('_')
+    // Split camelCase / snake_case / already-spaced input into words.
+    final spaced = type
+        .replaceAllMapped(RegExp(r'([a-z0-9])([A-Z])'), (m) => '${m[1]} ${m[2]}')
+        .replaceAll('_', ' ')
+        .trim();
+    return spaced
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
         .map((word) => word[0].toUpperCase() + word.substring(1).toLowerCase())
         .join(' ');
   }
 
   IconData _getHazardIcon(String type) {
-    switch (type.toUpperCase()) {
+    switch (normalizeHazardKey(type)) {
       case 'POTHOLE':
         return AppIcons.pothole;
       case 'ACCIDENT':
         return AppIcons.carCrash;
       case 'FOG':
         return AppIcons.cloudFog;
-      case 'SPEED_BREAKER':
-      case 'UNMARKED_BREAKER':
-      case 'ILLEGAL_BREAKER':
+      case 'SPEEDBREAKER':
+      case 'UNMARKEDBREAKER':
+      case 'ILLEGALBREAKER':
         return AppIcons.speedBump;
       case 'WATERLOGGING':
-      case 'WATERLOGGED_HAZARD':
+      case 'WATERLOGGEDHAZARD':
         return AppIcons.waves;
-      case 'ROAD_DAMAGE':
+      case 'ROADDAMAGE':
         return AppIcons.roadHorizon;
       case 'CONSTRUCTION':
         return AppIcons.hammer;
       case 'EMERGENCY':
+        return AppIcons.warningCircle;
+      case 'ROAD':
+        return AppIcons.roadHorizon;
+      case 'WEATHER':
+        return AppIcons.waves;
+      case 'VISIBILITY':
+        return AppIcons.cloudFog;
+      case 'DISASTER':
         return AppIcons.warningCircle;
       default:
         return AppIcons.warning;
@@ -357,25 +386,33 @@ class AppHazardMarker extends StatelessWidget {
   }
 
   IconData _getHazardIcon(String type) {
-    switch (type.toUpperCase()) {
+    switch (normalizeHazardKey(type)) {
       case 'POTHOLE':
         return AppIcons.pothole;
       case 'ACCIDENT':
         return AppIcons.carCrash;
       case 'FOG':
         return AppIcons.cloudFog;
-      case 'SPEED_BREAKER':
-      case 'UNMARKED_BREAKER':
-      case 'ILLEGAL_BREAKER':
+      case 'SPEEDBREAKER':
+      case 'UNMARKEDBREAKER':
+      case 'ILLEGALBREAKER':
         return AppIcons.speedBump;
       case 'WATERLOGGING':
-      case 'WATERLOGGED_HAZARD':
+      case 'WATERLOGGEDHAZARD':
         return AppIcons.waves;
-      case 'ROAD_DAMAGE':
+      case 'ROADDAMAGE':
         return AppIcons.roadHorizon;
       case 'CONSTRUCTION':
         return AppIcons.hammer;
       case 'EMERGENCY':
+        return AppIcons.warningCircle;
+      case 'ROAD':
+        return AppIcons.roadHorizon;
+      case 'WEATHER':
+        return AppIcons.waves;
+      case 'VISIBILITY':
+        return AppIcons.cloudFog;
+      case 'DISASTER':
         return AppIcons.warningCircle;
       default:
         return AppIcons.warning;

@@ -307,21 +307,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   IconData _getHazardIcon(String hazardType) {
-    switch (hazardType) {
+    switch (normalizeHazardKey(hazardType)) {
       case 'POTHOLE':
         return AppIcons.pothole;
       case 'ACCIDENT':
         return AppIcons.carCrash;
       case 'FOG':
         return AppIcons.cloudFog;
-      case 'SPEED_BREAKER':
-      case 'UNMARKED_BREAKER':
-      case 'ILLEGAL_BREAKER':
+      case 'SPEEDBREAKER':
+      case 'UNMARKEDBREAKER':
+      case 'ILLEGALBREAKER':
         return AppIcons.speedBump;
       case 'WATERLOGGING':
-      case 'WATERLOGGED_HAZARD':
+      case 'WATERLOGGEDHAZARD':
         return AppIcons.waves;
-      case 'ROAD_DAMAGE':
+      case 'ROADDAMAGE':
         return AppIcons.roadHorizon;
       case 'CONSTRUCTION':
         return AppIcons.hammer;
@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${report.hazardType.name.toUpperCase()} - ${(report.distanceMeters / 1000).toStringAsFixed(1)} km',
+          '${report.hazardType.displayName.toUpperCase()} - ${(report.distanceMeters / 1000).toStringAsFixed(1)} km',
           style: AppTypography.bodyMedium,
         ),
         backgroundColor: AppColors.hazardColor(report.hazardType.name),
@@ -348,6 +348,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   void _changeTab(AppTab tab) {
     setState(() => _currentTab = tab);
+  }
+
+  static final RegExp _coordinatePattern =
+      RegExp(r'^-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$');
+
+  bool _looksLikeCoordinates(String text) {
+    return _coordinatePattern.hasMatch(text.trim());
+  }
+
+  String _formatDistanceLabel(double distanceKm) {
+    if (distanceKm <= 0) return '';
+    if (distanceKm < 1) return '${(distanceKm * 1000).round()} m';
+    return '${distanceKm.toStringAsFixed(1)} km';
   }
 
   Widget _buildQuickActions() {
@@ -447,23 +460,27 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Column(
               children: alerts
                   .take(3)
-                  .map((alert) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: AppAlertListItem(
-                  hazardType: alert.category.name,
-                  title: alert.title,
-                  subtitle: alert.affectedRoads.isNotEmpty
-                      ? alert.affectedRoads.first
-                      : alert.location,
-                  distance: alert.distanceKm > 0
-                      ? (alert.distanceKm < 1
-                      ? '${(alert.distanceKm * 1000).round()} m'
-                      : '${alert.distanceKm.toStringAsFixed(1)} km')
-                      : '',
-                  severity: alert.severityDisplay,
-                  onTap: () => _changeTab(AppTab.alerts),
-                ),
-              ))
+                  .map((alert) {
+                final distanceLabel = _formatDistanceLabel(alert.distanceKm);
+                final rawSubtitle = alert.affectedRoads.isNotEmpty
+                    ? alert.affectedRoads.first
+                    : alert.location;
+                final subtitle = _looksLikeCoordinates(rawSubtitle)
+                    ? (distanceLabel.isNotEmpty ? '$distanceLabel away' : 'Nearby')
+                    : rawSubtitle;
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: AppAlertListItem(
+                    hazardType: alert.category.name,
+                    title: alert.title,
+                    subtitle: subtitle,
+                    distance: distanceLabel,
+                    severity: alert.severityDisplay,
+                    onTap: () => _changeTab(AppTab.alerts),
+                  ),
+                );
+              })
                   .toList(),
             ),
       ],

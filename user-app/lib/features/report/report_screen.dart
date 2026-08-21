@@ -623,7 +623,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
 
     try {
       final created = await ReportService.createReport(
-        title: _selectedHazardType!.name.replaceAll('_', ' ').toUpperCase(),
+        title: _selectedHazardType!.displayName.toUpperCase(),
         description: _detailsController.text,
         address: _locationController.text,
         hazardType: _selectedHazardType!.toBackendName(),

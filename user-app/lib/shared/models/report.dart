@@ -36,6 +36,38 @@ extension BackendEnumName on Enum {
   }
 }
 
+extension HazardTypeDisplay on HazardType {
+  /// Human-readable, properly spaced label (e.g. "Road Damage") regardless
+  /// of the enum's camelCase name (e.g. roadDamage).
+  String get displayName {
+    switch (this) {
+      case HazardType.pothole:
+        return 'Pothole';
+      case HazardType.accident:
+        return 'Accident';
+      case HazardType.fog:
+        return 'Fog';
+      case HazardType.speedBreaker:
+        return 'Speed Breaker';
+      case HazardType.unmarkedBreaker:
+        return 'Unmarked Breaker';
+      case HazardType.illegalBreaker:
+        return 'Illegal Breaker';
+      case HazardType.waterlogging:
+      case HazardType.waterloggedHazard:
+        return 'Waterlogging';
+      case HazardType.roadDamage:
+        return 'Road Damage';
+      case HazardType.construction:
+        return 'Construction';
+      case HazardType.emergency:
+        return 'Emergency';
+      case HazardType.other:
+        return 'Other';
+    }
+  }
+}
+
 enum ReportStatus {
   pending,
   inProgress,
@@ -99,33 +131,7 @@ class Report {
     required this.updatedAt,
   });
 
-  String get hazardTypeDisplay {
-    switch (hazardType) {
-      case HazardType.pothole:
-        return 'Pothole';
-      case HazardType.accident:
-        return 'Accident';
-      case HazardType.fog:
-        return 'Fog';
-      case HazardType.speedBreaker:
-        return 'Speed Breaker';
-      case HazardType.unmarkedBreaker:
-        return 'Unmarked Breaker';
-      case HazardType.illegalBreaker:
-        return 'Illegal Breaker';
-      case HazardType.waterlogging:
-      case HazardType.waterloggedHazard:
-        return 'Waterlogging';
-      case HazardType.roadDamage:
-        return 'Road Damage';
-      case HazardType.construction:
-        return 'Construction';
-      case HazardType.emergency:
-        return 'Emergency';
-      case HazardType.other:
-        return 'Other';
-    }
-  }
+  String get hazardTypeDisplay => hazardType.displayName;
 
   String get severityDisplay {
     return severity.name.toUpperCase();

@@ -140,12 +140,12 @@ class AppColors {
     'POTHOLE': Color(0xFFEA580C),
     'ACCIDENT': Color(0xFFDC2626),
     'FOG': Color(0xFF2563EB),
-    'SPEED_BREAKER': Color(0xFFD97706),
-    'UNMARKED_BREAKER': Color(0xFFD97706),
-    'ILLEGAL_BREAKER': Color(0xFFD97706),
+    'SPEEDBREAKER': Color(0xFFD97706),
+    'UNMARKEDBREAKER': Color(0xFFD97706),
+    'ILLEGALBREAKER': Color(0xFFD97706),
     'WATERLOGGING': Color(0xFF0891B2),
-    'WATERLOGGED_HAZARD': Color(0xFF0891B2),
-    'ROAD_DAMAGE': Color(0xFFEA580C),
+    'WATERLOGGEDHAZARD': Color(0xFF0891B2),
+    'ROADDAMAGE': Color(0xFFEA580C),
     'CONSTRUCTION': Color(0xFF7C3AED),
     'EMERGENCY': Color(0xFFDC2626),
     'OTHER': Color(0xFF64748B),
@@ -160,12 +160,12 @@ class AppColors {
     'POTHOLE': Color(0xFFFFEDD5),
     'ACCIDENT': Color(0xFFFEE2E2),
     'FOG': Color(0xFFDBEAFE),
-    'SPEED_BREAKER': Color(0xFFFEF3C7),
-    'UNMARKED_BREAKER': Color(0xFFFEF3C7),
-    'ILLEGAL_BREAKER': Color(0xFFFEF3C7),
+    'SPEEDBREAKER': Color(0xFFFEF3C7),
+    'UNMARKEDBREAKER': Color(0xFFFEF3C7),
+    'ILLEGALBREAKER': Color(0xFFFEF3C7),
     'WATERLOGGING': Color(0xFFCFFAFE),
-    'WATERLOGGED_HAZARD': Color(0xFFCFFAFE),
-    'ROAD_DAMAGE': Color(0xFFFFEDD5),
+    'WATERLOGGEDHAZARD': Color(0xFFCFFAFE),
+    'ROADDAMAGE': Color(0xFFFFEDD5),
     'CONSTRUCTION': Color(0xFFEDE9FE),
     'EMERGENCY': Color(0xFFFEE2E2),
     'OTHER': Color(0xFFF1F5F9),
@@ -195,11 +195,15 @@ class AppColors {
   };
 
   static Color hazardColor(String hazardType) {
-    return hazardColors[hazardType.toUpperCase()] ?? primary;
+    return hazardColors[_normalizeHazardKey(hazardType)] ?? primary;
   }
 
   static Color hazardLightColor(String hazardType) {
-    return hazardLightColors[hazardType.toUpperCase()] ?? primaryContainer;
+    return hazardLightColors[_normalizeHazardKey(hazardType)] ?? primaryContainer;
+  }
+
+  static String _normalizeHazardKey(String s) {
+    return s.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
   }
 
   static Color severityColor(String severity) {
