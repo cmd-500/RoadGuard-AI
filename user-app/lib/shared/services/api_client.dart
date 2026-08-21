@@ -147,8 +147,10 @@ class ApiClient {
     return _dio.get('/reports', queryParameters: {
       if (status != null) 'status': status,
       if (hazardType != null) 'hazardType': hazardType,
-      'page': page,
-      'limit': limit,
+      // Spring's Pageable is 0-indexed and expects `size`, not `limit`.
+      // Our `page` parameter is 1-indexed for callers, so subtract 1 here.
+      'page': page - 1,
+      'size': limit,
     }).then((r) => r.data);
   }
 

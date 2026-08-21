@@ -102,7 +102,10 @@ class ReportRepositoryImpl implements ReportRepository {
   }) async {
     try {
       final response = await _apiClient.getReports(
-        status: status?.name.toUpperCase(),
+        // Backend enum uses SCREAMING_SNAKE_CASE (e.g. IN_PROGRESS), so
+        // status.name.toUpperCase() ("INPROGRESS") does not match and the
+        // request fails silently for multi-word statuses.
+        status: status?.toBackendName(),
         hazardType: hazardType?.name.toUpperCase(),
         page: page,
         limit: limit,
@@ -173,7 +176,7 @@ class ReportRepositoryImpl implements ReportRepository {
   @override
   Future<Report> updateReportStatus(String id, ReportStatus status) async {
     try {
-      final response = await _apiClient.updateReportStatus(id, status.name.toUpperCase());
+      final response = await _apiClient.updateReportStatus(id, status.toBackendName());
       return Report.fromJson(response['data']);
     } catch (e) {
       throw _handleError(e);
