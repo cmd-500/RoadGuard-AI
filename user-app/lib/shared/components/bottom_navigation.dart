@@ -4,7 +4,6 @@ import 'icons.dart';
 
 enum AppTab { home, map, report, alerts, profile }
 
-/// Modern bottom navigation bar
 class AppBottomNavigation extends StatelessWidget {
   final AppTab currentTab;
   final ValueChanged<AppTab> onTabChanged;
@@ -150,7 +149,6 @@ class AppBottomNavigation extends StatelessWidget {
   }
 }
 
-/// Navigation shell that wraps screens with bottom navigation
 class AppNavigationShell extends StatefulWidget {
   final Widget child;
   final AppTab currentTab;
@@ -183,7 +181,6 @@ class _AppNavigationShellState extends State<AppNavigationShell> {
   }
 }
 
-/// Floating action button for primary action
 class AppFloatingActionButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onPressed;
@@ -241,7 +238,6 @@ class AppFloatingActionButton extends StatelessWidget {
   }
 }
 
-/// Speed dial FAB with multiple actions
 class AppSpeedDial extends StatefulWidget {
   final List<AppSpeedDialAction> actions;
   final IconData mainIcon;
@@ -297,7 +293,7 @@ class _AppSpeedDialState extends State<AppSpeedDial> with SingleTickerProviderSt
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
-        // Action buttons
+        //Action buttons
         ...List.generate(widget.actions.length, (index) {
           final action = widget.actions[index];
           return AnimatedBuilder(
@@ -325,7 +321,7 @@ class _AppSpeedDialState extends State<AppSpeedDial> with SingleTickerProviderSt
             },
           );
         }),
-        // Main FAB
+        //Main FAB
         FloatingActionButton(
           onPressed: _toggle,
           tooltip: widget.tooltip,

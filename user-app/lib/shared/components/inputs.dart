@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import '../../core/design_system/index.dart';
 import 'icons.dart';
 
-/// Modern text field with consistent styling
 class AppTextField extends StatelessWidget {
   final String? label;
   final String? hint;
@@ -64,11 +63,7 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final baseDecoration = theme.inputDecorationTheme;
-    // The color constants in AppColors are light-theme-only, so the typed
-    // text must be resolved against the active brightness, not hardcoded.
-    // Previously this always used AppColors.textPrimary, which made typed
-    // text nearly invisible in dark mode (dark text on a dark/mismatched
-    // fill), even though the cursor still moved normally.
+
     final isDark = theme.brightness == Brightness.dark;
     final effectiveTextColor = enabled
         ? (isDark ? AppColorsDark.textPrimary : AppColors.textPrimary)
@@ -133,7 +128,6 @@ class AppTextField extends StatelessWidget {
   }
 }
 
-/// Search field with filter and location buttons
 class AppSearchField extends StatelessWidget {
   final String hint;
   final TextEditingController? controller;
@@ -214,7 +208,6 @@ class AppSearchField extends StatelessWidget {
   }
 }
 
-/// Text area for multi-line input
 class AppTextArea extends StatelessWidget {
   final String? label;
   final String? hint;
@@ -266,7 +259,7 @@ class AppTextArea extends StatelessWidget {
   }
 }
 
-/// Dropdown/select field
+//Dropdown/select field
 class AppDropdownField<T> extends StatelessWidget {
   final String? label;
   final String? hint;
@@ -356,7 +349,6 @@ class AppDropdownItem<T> {
   });
 }
 
-/// Chip input for tags/multiple values
 class AppChipInput extends StatelessWidget {
   final List<String> chips;
   final ValueChanged<List<String>> onChanged;
@@ -442,7 +434,6 @@ class AppChipInput extends StatelessWidget {
   }
 }
 
-/// Number input with increment/decrement buttons
 class AppNumberInput extends StatelessWidget {
   final String? label;
   final String? hint;
@@ -498,7 +489,6 @@ class AppNumberInput extends StatelessWidget {
   }
 }
 
-/// OTP/PIN input field
 class AppOtpInput extends StatelessWidget {
   final int length;
   final ValueChanged<String> onCompleted;
@@ -574,7 +564,6 @@ class AppOtpInput extends StatelessWidget {
   }
 }
 
-/// Form field wrapper with label and error
 class AppFormField extends StatelessWidget {
   final String? label;
   final String? helperText;

@@ -16,7 +16,7 @@ class ReportService {
     required String severity,
     required double latitude,
     required double longitude,
-    required dynamic imageFile, // File on mobile, Uint8List on web
+    required dynamic imageFile,
     String? imageName,
   }) async {
     final dataJson = jsonEncode({

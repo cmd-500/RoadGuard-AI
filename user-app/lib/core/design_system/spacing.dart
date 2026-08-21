@@ -4,7 +4,6 @@ import 'colors.dart';
 class AppSpacing {
   AppSpacing._();
 
-  // Base spacing scale (4px base) - refined for modern UI
   static const double space0 = 0.0;
   static const double space1 = 4.0;
   static const double space2 = 8.0;
@@ -20,31 +19,30 @@ class AppSpacing {
   static const double space20 = 80.0;
   static const double space24 = 96.0;
 
-  // Semantic aliases for readability
-  static const double xs = space1;      // 4
-  static const double sm = space2;      // 8
-  static const double md = space3;      // 12
-  static const double lg = space4;      // 16
-  static const double xl = space5;      // 20
-  static const double xxl = space6;     // 24
-  static const double xxxl = space8;    // 32
-  static const double xxxxl = space10;  // 40
-  static const double xxxxxl = space12; // 48
-  static const double xxxxxxl = space16; // 64
+  static const double xs = space1;      //4
+  static const double sm = space2;      //8
+  static const double md = space3;      //12
+  static const double lg = space4;      //16
+  static const double xl = space5;      //20
+  static const double xxl = space6;     //24
+  static const double xxxl = space8;    //32
+  static const double xxxxl = space10;  //40
+  static const double xxxxxl = space12; //48
+  static const double xxxxxxl = space16; //64
 
-  // Layout-specific spacing
-  static const double screenPadding = space6;        // 24
-  static const double screenPaddingSmall = space4;   // 16
-  static const double screenPaddingLarge = space8;   // 32
-  static const double cardPadding = space4;          // 16
-  static const double cardPaddingLarge = space6;     // 24
-  static const double sectionSpacing = space8;       // 32
-  static const double componentSpacing = space4;     // 16
-  static const double itemSpacing = space3;          // 12
-  static const double inlineSpacing = space2;        // 8
-  static const double inlineSpacingSmall = space1;   // 4
+  //Layout-specific spacing
+  static const double screenPadding = space6;        //24
+  static const double screenPaddingSmall = space4;   //16
+  static const double screenPaddingLarge = space8;   //32
+  static const double cardPadding = space4;          //16
+  static const double cardPaddingLarge = space6;     //24
+  static const double sectionSpacing = space8;       //32
+  static const double componentSpacing = space4;     //16
+  static const double itemSpacing = space3;          //12
+  static const double inlineSpacing = space2;        //8
+  static const double inlineSpacingSmall = space1;   //4
 
-  // Component heights
+  //Component heights
   static const double appBarHeight = 56.0;
   static const double bottomNavHeight = 80.0;
   static const double fabSize = 56.0;
@@ -56,14 +54,14 @@ class AppSpacing {
   static const double buttonHeightSmall = 40.0;
   static const double chipHeight = 32.0;
 
-  // Animation durations
+  //Animation durations
   static const Duration durationInstant = Duration(milliseconds: 50);
   static const Duration durationFast = Duration(milliseconds: 150);
   static const Duration durationNormal = Duration(milliseconds: 200);
   static const Duration durationSlow = Duration(milliseconds: 300);
   static const Duration durationVerySlow = Duration(milliseconds: 500);
 
-  // Animation curves
+  //Animation curves
   static const Curve curveStandard = Curves.easeInOut;
   static const Curve curveEmphasized = Curves.easeOutCubic;
   static const Curve curveDecelerate = Curves.decelerate;
@@ -71,7 +69,6 @@ class AppSpacing {
   static const Curve curveSpring = Curves.elasticOut;
   static const Curve curveBounce = Curves.bounceOut;
 
-  // Common animation configs
   static const Duration pageTransitionDuration = Duration(milliseconds: 300);
   static const Curve pageTransitionCurve = Curves.easeInOutCubic;
 
@@ -96,17 +93,17 @@ class AppSpacing {
   static const Duration slideOutDuration = Duration(milliseconds: 200);
   static const Curve slideCurve = Curves.easeOutCubic;
 
-  // Staggered animations
+  //Staggered animations
   static const Duration staggerDelay = Duration(milliseconds: 50);
   static const int maxStaggerItems = 10;
 
-  // Micro-interactions
+  //Micro-interactions
   static const Duration tapFeedback = Duration(milliseconds: 50);
   static const Duration hoverFeedback = Duration(milliseconds: 150);
   static const Duration focusFeedback = Duration(milliseconds: 100);
   static const Duration loadingPulse = Duration(milliseconds: 1000);
 
-  // Spring animations
+  //Spring animations
   static const Duration springDuration = Duration(milliseconds: 500);
   static const SpringDescription springStandard = SpringDescription(
     mass: 1.0,
@@ -128,7 +125,6 @@ class AppSpacing {
 class AppRadius {
   AppRadius._();
 
-  // Base radius scale
   static const double none = 0.0;
   static const double xs = 4.0;
   static const double sm = 8.0;
@@ -139,7 +135,7 @@ class AppRadius {
   static const double xxxl = 32.0;
   static const double round = 9999.0;
 
-  // Semantic radius
+  //Semantic radius
   static const double button = 14.0;
   static const double buttonSmall = 10.0;
   static const double buttonLarge = 18.0;
@@ -161,7 +157,6 @@ class AppRadius {
 class AppShadows {
   AppShadows._();
 
-  // Elevation levels (Material 3 inspired)
   static List<BoxShadow> get level0 => [];
 
   static List<BoxShadow> get level1 => [
@@ -239,7 +234,7 @@ class AppShadows {
     ),
   ];
 
-  // Semantic shadows
+  //Semantic shadows
   static List<BoxShadow> get none => level0;
   static List<BoxShadow> get card => level1;
   static List<BoxShadow> get cardHover => level2;
@@ -300,7 +295,6 @@ class AppShadows {
     ),
   ];
 
-  // Colored shadows for brand elements
   static List<BoxShadow> get primaryGlow => [
     BoxShadow(
       color: AppColors.primary.withValues(alpha: 0.3),
@@ -374,7 +368,7 @@ class AppBorders {
     width: 2.0,
   );
 
-  // Semantic borders
+  //Semantic borders
   static BorderSide get card => thin;
   static BorderSide get cardHover => medium;
   static BorderSide get input => thin;
@@ -392,40 +386,40 @@ class AppBorders {
 class AppMotion {
   AppMotion._();
 
-  // Page transitions
+  //Page transitions
   static const Duration pageTransition = Duration(milliseconds: 300);
   static const Curve pageTransitionCurve = Curves.easeInOutCubic;
 
-  // Container transforms
+  //Container transforms
   static const Duration containerTransform = Duration(milliseconds: 350);
   static const Curve containerTransformCurve = Curves.easeInOutCubic;
 
-  // Fade transitions
+  //Fade transitions
   static const Duration fadeIn = Duration(milliseconds: 200);
   static const Duration fadeOut = Duration(milliseconds: 150);
   static const Curve fadeCurve = Curves.easeOut;
 
-  // Scale transitions
+  //Scale transitions
   static const Duration scaleIn = Duration(milliseconds: 200);
   static const Duration scaleOut = Duration(milliseconds: 150);
   static const Curve scaleCurve = Curves.easeOutBack;
 
-  // Slide transitions
+  //Slide transitions
   static const Duration slideIn = Duration(milliseconds: 300);
   static const Duration slideOut = Duration(milliseconds: 200);
   static const Curve slideCurve = Curves.easeOutCubic;
 
-  // Staggered animations
+  //Staggered animations
   static const Duration staggerDelay = Duration(milliseconds: 50);
   static const int maxStaggerItems = 10;
 
-  // Micro-interactions
+  //Micro-interactions
   static const Duration tapFeedback = Duration(milliseconds: 50);
   static const Duration hoverFeedback = Duration(milliseconds: 150);
   static const Duration focusFeedback = Duration(milliseconds: 100);
   static const Duration loadingPulse = Duration(milliseconds: 1000);
 
-  // Spring animations
+  //Spring animations
   static const Duration springDuration = Duration(milliseconds: 500);
   static const SpringDescription springStandard = SpringDescription(
     mass: 1.0,

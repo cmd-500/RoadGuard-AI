@@ -4,9 +4,6 @@ abstract class AlertRepository {
   Future<List<SafetyAlert>> getAlerts({AlertCategory? category});
 }
 
-/// Mock implementation — swap for an ApiClient-backed impl once the
-/// RoadSafe backend exposes a /alerts endpoint. Only this class changes;
-/// AlertProvider and the UI stay the same.
 class MockAlertRepositoryImpl implements AlertRepository {
   static final List<SafetyAlert> _mockAlerts = [
     SafetyAlert(

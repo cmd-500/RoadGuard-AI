@@ -360,7 +360,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
 
   Widget _buildMapControls() {
     return Positioned(
-      bottom: 120, // Account for bottom sheet min height
+      bottom: 120,
       right: AppSpacing.screenPadding,
       child: Column(
         children: [

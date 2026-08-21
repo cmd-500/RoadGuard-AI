@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppIcons {
   AppIcons._();
 
-  // Navigation
+  //Navigation
   static const IconData home = Icons.home_outlined;
   static const IconData homeFilled = Icons.home;
   static const IconData map = Icons.map_outlined;
@@ -15,7 +15,7 @@ class AppIcons {
   static const IconData profile = Icons.person_outline;
   static const IconData profileFilled = Icons.person;
 
-  // Actions
+  //Actions
   static const IconData plus = Icons.add;
   static const IconData minus = Icons.remove;
   static const IconData close = Icons.close;
@@ -46,7 +46,7 @@ class AppIcons {
   static const IconData retake = Icons.refresh_outlined;
   static const IconData paperPlane = Icons.send_outlined;
 
-  // Navigation arrows
+  //Navigation arrows
   static const IconData back = Icons.arrow_back_ios_new;
   static const IconData forward = Icons.arrow_forward_ios;
   static const IconData up = Icons.keyboard_arrow_up;
@@ -58,10 +58,10 @@ class AppIcons {
   static const IconData caretUp = Icons.keyboard_arrow_up;
   static const IconData caretDown = Icons.keyboard_arrow_down;
 
-  // Additional navigation
+  //Additional navigation
   static const IconData openInFull = Icons.fullscreen_outlined;
 
-  // Media
+  //Media
   static const IconData camera = Icons.camera_alt_outlined;
   static const IconData cameraFilled = Icons.camera_alt;
   static const IconData photo = Icons.photo_outlined;
@@ -73,7 +73,6 @@ class AppIcons {
   static const IconData flash = Icons.flash_on_outlined;
   static const IconData image = Icons.image_outlined;
 
-  // Location & Maps
   static const IconData location = Icons.location_on_outlined;
   static const IconData locationFilled = Icons.location_on;
   static const IconData gps = Icons.gps_fixed;
@@ -91,7 +90,6 @@ class AppIcons {
   static const IconData streetView = Icons.streetview_outlined;
   static const IconData compass = Icons.explore_outlined;
 
-  // Hazards & Road
   static const IconData pothole = Icons.scatter_plot;
   static const IconData carCrash = Icons.car_crash;
   static const IconData cloudFog = Icons.cloud_queue;
@@ -108,7 +106,7 @@ class AppIcons {
   static const IconData bus = Icons.directions_bus;
   static const IconData train = Icons.directions_train;
 
-  // Communication
+  //Communication
   static const IconData bell = Icons.notifications_none;
   static const IconData bellFilled = Icons.notifications;
   static const IconData bellOff = Icons.notifications_off;
@@ -120,7 +118,6 @@ class AppIcons {
   static const IconData phoneFilled = Icons.phone;
   static const IconData sms = Icons.sms_outlined;
 
-  // Social & User
   static const IconData user = Icons.person_outline;
   static const IconData userFilled = Icons.person;
   static const IconData users = Icons.people_outline;
@@ -141,7 +138,7 @@ class AppIcons {
   static const IconData key = Icons.key_outlined;
   static const IconData signOut = Icons.logout_outlined;
 
-  // UI Elements
+  //UI Elements
   static const IconData menu = Icons.menu;
   static const IconData more = Icons.more_vert;
   static const IconData moreHorizontal = Icons.more_horiz;
@@ -163,7 +160,6 @@ class AppIcons {
   static const IconData document = Icons.article_outlined;
   static const IconData documentFilled = Icons.article;
 
-  // Data & Analytics
   static const IconData chart = Icons.bar_chart_outlined;
   static const IconData chartFilled = Icons.bar_chart;
   static const IconData analytics = Icons.analytics_outlined;
@@ -183,7 +179,7 @@ class AppIcons {
   static const IconData bluetooth = Icons.bluetooth_outlined;
   static const IconData bluetoothConnected = Icons.bluetooth_connected;
 
-  // Status
+  //Status
   static const IconData checkCircleOutline = Icons.check_circle_outline;
   static const IconData cancelOutline = Icons.cancel_outlined;
   static const IconData helpOutline = Icons.help_outline;
@@ -194,7 +190,7 @@ class AppIcons {
   static const IconData pending = Icons.pending_outlined;
   static const IconData pendingFilled = Icons.pending;
 
-  // Misc
+  //Misc
   static const IconData gift = Icons.card_giftcard_outlined;
   static const IconData giftFilled = Icons.card_giftcard;
   static const IconData trophy = Icons.emoji_events_outlined;

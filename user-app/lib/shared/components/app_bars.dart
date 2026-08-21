@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/design_system/index.dart';
 import 'icons.dart';
 
-/// Standard app bar with title and actions
 class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final Widget? leading;
@@ -72,7 +71,6 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(toolbarHeight ?? AppSpacing.appBarHeight);
 }
 
-/// Search app bar with built-in search field
 class AppSearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String hintText;
   final TextEditingController? controller;
@@ -171,7 +169,6 @@ class AppSearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(AppSpacing.appBarHeight + 12);
 }
 
-/// Sliver app bar for scrollable content
 class AppSliverAppBar extends StatelessWidget {
   final String? title;
   final Widget? leading;
@@ -228,7 +225,6 @@ class AppSliverAppBar extends StatelessWidget {
   }
 }
 
-/// Bottom app bar for bottom navigation integration
 class AppBottomAppBar extends StatelessWidget {
   final Widget? child;
   final Color? color;
@@ -257,7 +253,6 @@ class AppBottomAppBar extends StatelessWidget {
   }
 }
 
-/// Custom app bar with gradient background
 class AppGradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final Widget? leading;
@@ -329,7 +324,6 @@ class AppGradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(toolbarHeight);
 }
 
-/// Tab bar app bar
 class AppTabBarAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final Widget? leading;

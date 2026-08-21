@@ -6,16 +6,15 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
   const [err, setErr] = useState(false);
   const [showConf, setShowConf] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  
+
   const [showPastRecords, setShowPastRecords] = useState(false);
-  
-  // States for confirmation dialogue inside Past Records
+
   const [resolveConfirmId, setResolveConfirmId] = useState(null);
   const [resolvedMsg, setResolvedMsg] = useState("");
 
   const doLogin = (e) => {
     e.preventDefault();
-    // Enforcing @gmail.com requirement
+
     if (uName.trim().toLowerCase().endsWith("@gmail.com") && pwd === "admin") {
       onLogin();
       setErr(false);
@@ -28,7 +27,7 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
   };
 
   const confirmResolve = () => {
-    onResolve(resolveConfirmId); 
+    onResolve(resolveConfirmId);
     setResolvedMsg("Live alert successfully marked as resolved!");
     setResolveConfirmId(null);
     setTimeout(() => setResolvedMsg(""), 3000);
@@ -49,7 +48,7 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
 
           <div className="flex items-center gap-8">
             <ul className="hidden lg:flex gap-6 items-center">
-              {/* Added Current & Past Records */}
+              {}
               <li
                   onClick={() => setShowPastRecords(false)}
                   className={`text-sm font-medium cursor-pointer transition-colors ${!showPastRecords ? 'text-white border-b-2 border-[#22c55e] pb-1 mt-1' : 'text-slate-300 hover:text-[#22c55e]'}`}
@@ -92,13 +91,13 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
           </div>
         </nav>
 
-        {/* Past Records Section */}
+        {}
         {showPastRecords && (
             <div className="fixed inset-0 top-[68px] bg-slate-50 z-[40] p-6 overflow-y-auto">
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-2xl font-bold text-slate-800 mb-6">Past Records & Live Alerts</h2>
-                
-                {/* Success Indication */}
+
+                {/*Success Indication*/}
                 {resolvedMsg && (
                   <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg border border-green-200 font-medium text-sm flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -114,8 +113,8 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
                         <p className="text-sm text-slate-500">{item.loc}</p>
                         <p className="text-xs text-slate-400 mt-1">{item.date} • {item.time}</p>
                       </div>
-                      <button 
-                        onClick={() => setResolveConfirmId(item.id)} 
+                      <button
+                        onClick={() => setResolveConfirmId(item.id)}
                         className="bg-[#22c55e] hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors"
                       >
                         Mark as Resolved
@@ -129,7 +128,7 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
                 </div>
               </div>
 
-              {/* Confirmation Dialogue for Resolving */}
+              {}
               {resolveConfirmId && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
                   <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
@@ -148,7 +147,7 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
             </div>
         )}
 
-        {/* The Login Dialogue Box */}
+        {}
         {showLogin && (
             <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
               <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
@@ -172,7 +171,7 @@ export const Navbar = ({ auth, onLogin, onLogout, data, onResolve }) => {
             </div>
         )}
 
-        {/* Logout Confirmation Dialog */}
+        {}
         {showConf && (
             <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[99999] p-4">
               <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm text-center">

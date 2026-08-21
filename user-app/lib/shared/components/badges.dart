@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/design_system/index.dart';
 import 'icons.dart';
 
-/// Generic badge component
 class AppBadge extends StatelessWidget {
   final String label;
   final Color? backgroundColor;
@@ -59,7 +58,6 @@ class AppBadge extends StatelessWidget {
   }
 }
 
-/// Dot indicator badge
 class AppDotBadge extends StatelessWidget {
   final Color color;
   final double size;
@@ -87,7 +85,6 @@ class AppDotBadge extends StatelessWidget {
   }
 }
 
-/// Status badge with semantic colors
 class AppStatusBadge extends StatelessWidget {
   final String label;
   final AppStatus status;
@@ -138,7 +135,6 @@ class AppStatusBadge extends StatelessWidget {
 
 enum AppStatus { success, warning, error, info, pending, closed }
 
-/// Severity badge for hazards/alerts
 class AppSeverityBadge extends StatelessWidget {
   final String severity;
   final bool showIcon;
@@ -205,7 +201,6 @@ class AppSeverityBadge extends StatelessWidget {
   }
 }
 
-/// Hazard type badge
 class AppHazardBadge extends StatelessWidget {
   final String hazardType;
   final bool showIcon;
@@ -278,7 +273,6 @@ class AppHazardBadge extends StatelessWidget {
   }
 }
 
-/// Count badge (for notifications, etc.)
 class AppCountBadge extends StatelessWidget {
   final int count;
   final int maxCount;
@@ -329,9 +323,8 @@ class AppCountBadge extends StatelessWidget {
   }
 }
 
-/// Progress badge (circular progress indicator)
 class AppProgressBadge extends StatelessWidget {
-  final double progress; // 0.0 to 1.0
+  final double progress;
   final double size;
   final double strokeWidth;
   final Color? progressColor;
@@ -372,7 +365,6 @@ class AppProgressBadge extends StatelessWidget {
   }
 }
 
-/// Outline badge (no fill)
 class AppOutlineBadge extends StatelessWidget {
   final String label;
   final Color? borderColor;

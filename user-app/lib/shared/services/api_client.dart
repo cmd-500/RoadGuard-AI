@@ -3,11 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
-  // Default assumes Android emulator talking to a backend running on your
-  // own machine. Override per target without touching code:
-  //   flutter run --dart-define=API_BASE_URL=http://localhost:8080/api/v1        (iOS simulator)
-  //   flutter run --dart-define=API_BASE_URL=http://192.168.x.x:8080/api/v1      (physical device, same Wi-Fi)
-  //   flutter run --dart-define=API_BASE_URL=https://your-app.up.railway.app/api/v1  (deployed backend)
+
   static const String _baseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'http://10.0.2.2:8080/api/v1',
@@ -100,7 +96,7 @@ class ApiClient {
 
   Dio get dio => _dio;
 
-  // Auth
+  //Auth
   Future<Map<String, dynamic>> register({
     required String name,
     required String email,
@@ -127,7 +123,7 @@ class ApiClient {
     return _dio.post('/auth/refresh', data: {'refreshToken': refreshToken}).then((r) => r.data);
   }
 
-  // Reports
+  //Reports
   Future<Map<String, dynamic>> createReport({
     required Map<String, dynamic> data,
     required MultipartFile image,
@@ -186,7 +182,7 @@ class ApiClient {
     return _dio.put('/reports/$id/status', data: {'status': status}).then((r) => r.data);
   }
 
-  // Votes
+  //Votes
   Future<Map<String, dynamic>> castVote(String reportId, String voteType) {
     return _dio.post('/reports/$reportId/votes', data: {'voteType': voteType}).then((r) => r.data);
   }

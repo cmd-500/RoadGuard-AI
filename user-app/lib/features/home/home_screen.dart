@@ -51,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       context.read<AlertProvider>().fetchAlerts();
     });
 
-    // Poll for alerts every 30 seconds
     _alertPollTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       if (mounted) context.read<AlertProvider>().fetchAlerts();
     });
@@ -249,7 +248,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final reportProvider = context.read<ReportProvider>();
     final markers = <Marker>[];
 
-    // Current location marker
     final locProvider = context.read<LocationProvider>();
     if (locProvider.currentPosition != null) {
       markers.add(
@@ -277,7 +275,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       );
     }
 
-    // Nearby hazard markers (limit to 10 for performance on preview)
     final reports = reportProvider.nearbyReports.take(10).toList();
     for (final report in reports) {
       final color = AppColors.hazardColor(report.hazardType.name);

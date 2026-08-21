@@ -37,7 +37,6 @@ class ReportModel {
   final UserModel? createdBy;
   final DateTime createdAt;
 
-  // present only on route-check results
   final double? distanceToRouteMeters;
   final double? distanceFromStartMeters;
 
@@ -64,14 +63,14 @@ class ReportModel {
   });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
-    // Backend returns location as GeoJSON Point with coordinates [lng, lat]
+
     double latitude, longitude;
     if (json['location'] is Map && json['location']['coordinates'] is List) {
       final coords = json['location']['coordinates'] as List;
       longitude = (coords[0] as num).toDouble();
       latitude = (coords[1] as num).toDouble();
     } else if (json['latitude'] != null && json['longitude'] != null) {
-      // Fallback for direct lat/lng fields
+
       latitude = (json['latitude'] as num).toDouble();
       longitude = (json['longitude'] as num).toDouble();
     } else {
@@ -79,7 +78,6 @@ class ReportModel {
       longitude = 0;
     }
 
-    // Handle both old and new field names for status
     final status = json['report_status'] ?? json['status'] ?? 'PENDING';
     final communityStatus = json['community_status'] ?? json['communityStatus'] ?? 'UNVERIFIED';
 
@@ -104,7 +102,6 @@ class ReportModel {
     );
   }
 
-  // route-check response wraps each report as { report, distanceToRouteMeters, distanceFromStartMeters }
   factory ReportModel.fromRouteCheckJson(Map<String, dynamic> json) {
     final base = ReportModel.fromJson(json['report']);
     return ReportModel(

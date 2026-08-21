@@ -5,11 +5,6 @@ import '../models/report.dart';
 import 'alert_repository.dart';
 import 'report_repository.dart';
 
-/// Live-Alerts feed backed by real reports.
-///
-/// Reports show up here once an admin has reviewed them in the
-/// admin-portal and marked them as "Verified" (IN_PROGRESS) or
-/// "Resolved" (RESOLVED). Both represent admin-approved alerts.
 class ApiAlertRepositoryImpl implements AlertRepository {
   final ReportRepository _reportRepository;
 
@@ -20,7 +15,6 @@ class ApiAlertRepositoryImpl implements AlertRepository {
   Future<List<SafetyAlert>> getAlerts({AlertCategory? category}) async {
     final allReports = <Report>[];
 
-    // Try fetching with status filters first (admin-approved statuses)
     try {
       final resolvedResult = await _reportRepository.getReports(
         status: ReportStatus.resolved,
@@ -43,7 +37,6 @@ class ApiAlertRepositoryImpl implements AlertRepository {
       developer.log('Error fetching inProgress reports: $e');
     }
 
-    // Fallback 1: Also check PENDING reports (some backends use this for "verified")
     if (allReports.isEmpty) {
       try {
         developer.log('Trying PENDING reports...');
@@ -58,13 +51,12 @@ class ApiAlertRepositoryImpl implements AlertRepository {
       }
     }
 
-    // Fallback 2: if still empty, fetch all and filter client-side
     if (allReports.isEmpty) {
       try {
         developer.log('No reports with status filters, fetching all reports...');
         final allResult = await _reportRepository.getReports(limit: 100);
-        final filtered = allResult.reports.where((r) => 
-          r.status == ReportStatus.inProgress || 
+        final filtered = allResult.reports.where((r) =>
+          r.status == ReportStatus.inProgress ||
           r.status == ReportStatus.resolved ||
           r.status == ReportStatus.pending
         ).toList();
@@ -75,7 +67,6 @@ class ApiAlertRepositoryImpl implements AlertRepository {
       }
     }
 
-    // Final fallback: show ALL reports (for debugging - remove in production)
     if (allReports.isEmpty) {
       try {
         developer.log('Final fallback: fetching ALL reports...');
@@ -96,7 +87,7 @@ class ApiAlertRepositoryImpl implements AlertRepository {
     try {
       currentPosition = await Geolocator.getLastKnownPosition();
     } catch (_) {
-      // Location isn't essential for showing alerts, so ignore failures.
+
     }
 
     final alerts = allReports.map((report) {

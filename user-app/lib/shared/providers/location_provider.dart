@@ -66,7 +66,7 @@ class LocationProvider extends ChangeNotifier {
     });
   }
 
-  bool get mounted => true; // Override in tests if needed
+  bool get mounted => true;
 
   Future<String> _getAddressFromPosition(Position position) async {
     try {

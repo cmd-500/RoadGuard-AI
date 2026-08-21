@@ -51,13 +51,11 @@ public class ImageVerificationUtil {
             BufferedImage image = Imaging.getBufferedImage(is);
             if (image == null) return 0;
 
-            // Convert to grayscale
             BufferedImage gray = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
             Graphics g = gray.getGraphics();
             g.drawImage(image, 0, 0, null);
             g.dispose();
 
-            // Laplacian variance for blur detection
             int width = gray.getWidth();
             int height = gray.getHeight();
             double sum = 0;
@@ -91,13 +89,12 @@ public class ImageVerificationUtil {
             BufferedImage image = Imaging.getBufferedImage(new ByteArrayInputStream(imageBytes));
             if (image == null) return "";
 
-            // Resize to 32x32 for perceptual hash
             BufferedImage resized = new BufferedImage(32, 32, BufferedImage.TYPE_BYTE_GRAY);
             Graphics g = resized.getGraphics();
             g.drawImage(image, 0, 0, 32, 32, null);
             g.dispose();
 
-            // Compute average
+            //Compute average
             long sum = 0;
             for (int y = 0; y < 32; y++) {
                 for (int x = 0; x < 32; x++) {
@@ -106,7 +103,7 @@ public class ImageVerificationUtil {
             }
             double avg = sum / 1024.0;
 
-            // Build hash
+            //Build hash
             StringBuilder hash = new StringBuilder();
             for (int y = 0; y < 32; y++) {
                 for (int x = 0; x < 32; x++) {
@@ -114,7 +111,6 @@ public class ImageVerificationUtil {
                 }
             }
 
-            // Convert to hex
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = md.digest(hash.toString().getBytes());
             return bytesToHex(hashBytes).substring(0, 16);
@@ -156,7 +152,7 @@ public class ImageVerificationUtil {
                 }
             }
         } catch (IOException | ImageReadException e) {
-            // No EXIF GPS data
+
         }
         return null;
     }
@@ -173,7 +169,7 @@ public class ImageVerificationUtil {
     }
 
     public double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371000; // Earth radius in meters
+        final int R = 6371000;
         double phi1 = Math.toRadians(lat1);
         double phi2 = Math.toRadians(lat2);
         double deltaPhi = Math.toRadians(lat2 - lat1);

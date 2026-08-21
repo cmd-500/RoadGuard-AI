@@ -31,7 +31,7 @@ class ReportProvider extends ChangeNotifier {
       nearbyHazards = await ReportService.getNearby(lat, lng);
       notifyListeners();
     } on DioException {
-      // silent: nearby-alert polling shouldn't interrupt driving with error dialogs
+
     }
   }
 

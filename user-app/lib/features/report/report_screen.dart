@@ -230,10 +230,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   }
 
   Widget _buildSeveritySelector() {
-    // Only Low / Medium / High are offered here because the admin portal
-    // only recognizes those three severities (see admin-portal/src/App.jsx
-    // sevFromBackend). A 4th "Critical" option would submit successfully
-    // but silently fall back to "low" once it reaches the admin dashboard.
+
     final severities = [
       (Severity.low, 'Low', 'Minor issue', AppIcons.circle, 'LOW'),
       (Severity.medium, 'Medium', 'Noticeable hazard', AppIcons.warning, 'MEDIUM'),
@@ -448,7 +445,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
     return CameraCaptureScreen(
       onPhotoCaptured: (imageBytes, imageName) {
         setState(() => _capturedImageBytes = imageBytes);
-        // Navigate to review step
+
         setState(() => _currentStep = 2);
         _pageController.animateToPage(
           2,
@@ -533,9 +530,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
             child: SizedBox(
               height: 150,
               child: IgnorePointer(
-                // Read-only preview here; full interaction happens on the
-                // location step (step 0), so we don't want pan/zoom
-                // gestures fighting the review page's scroll view.
+
                 child: FlutterMap(
                   options: MapOptions(
                     initialCenter: LatLng(
@@ -724,7 +719,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                 }
                     : null)
                     : _currentStep == 1
-                    ? null // Handled by camera screen
+                    ? null
                     : _submitReport,
                 isLoading: _currentStep == 2 && context.watch<ReportProvider>().isSubmitting,
                 isFullWidth: true,

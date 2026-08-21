@@ -28,7 +28,7 @@ export function Modal({
       confirmType === "verify" ||
       confirmType === "resolve"
     ) {
-      action(obj.id);
+      action(obj.id, confirmType);
     }
   };
 
@@ -199,14 +199,9 @@ export function Modal({
           )}
 
           {recordMode && (
-            <button
-              onClick={() =>
-                setConfirmType("resolve")
-              }
-              className="w-full py-2.5 bg-[#22c55e] text-white rounded-lg font-semibold hover:bg-green-600 transition-colors shadow-sm"
-            >
-              Mark as Resolved
-            </button>
+            <div className="w-full py-2.5 bg-green-50 text-green-700 rounded-lg font-semibold text-center text-sm border border-green-200">
+              ✓ Verified Record
+            </div>
           )}
 
           {confirmType && (

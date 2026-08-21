@@ -8,7 +8,6 @@ class AppTypography {
   static const String fontFamilyMono = 'JetBrains Mono';
   static const String fontFamilyDisplay = 'Inter';
 
-  // Display Styles (for hero sections, large headlines)
   static const TextStyle displayLarge = TextStyle(
     fontFamily: fontFamilyDisplay,
     fontSize: 57,
@@ -36,7 +35,6 @@ class AppTypography {
     color: AppColors.textPrimary,
   );
 
-  // Headline Styles (screen titles, section headers)
   static const TextStyle headlineLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 32,
@@ -64,7 +62,6 @@ class AppTypography {
     color: AppColors.textPrimary,
   );
 
-  // Title Styles (card titles, component headers)
   static const TextStyle titleLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 22,
@@ -92,7 +89,6 @@ class AppTypography {
     color: AppColors.textPrimary,
   );
 
-  // Body Styles (main content)
   static const TextStyle bodyLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
@@ -120,7 +116,6 @@ class AppTypography {
     color: AppColors.textSecondary,
   );
 
-  // Label Styles (buttons, chips, form labels)
   static const TextStyle labelLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
@@ -148,7 +143,7 @@ class AppTypography {
     color: AppColors.textTertiary,
   );
 
-  // Button Styles
+  //Button Styles
   static const TextStyle buttonLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
@@ -173,7 +168,6 @@ class AppTypography {
     letterSpacing: 0.5,
   );
 
-  // Caption & Overline (metadata, timestamps)
   static const TextStyle caption = TextStyle(
     fontFamily: fontFamily,
     fontSize: 12,
@@ -192,7 +186,6 @@ class AppTypography {
     color: AppColors.textTertiary,
   );
 
-  // Monospace (coordinates, codes, data)
   static const TextStyle monoSmall = TextStyle(
     fontFamily: fontFamilyMono,
     fontSize: 12,
@@ -220,7 +213,6 @@ class AppTypography {
     color: AppColors.textPrimary,
   );
 
-  // Helper methods for common variations
   static TextStyle withColor(TextStyle style, Color color) {
     return style.copyWith(color: color);
   }
@@ -242,7 +234,6 @@ class AppTypography {
   }
 }
 
-// Dark theme typography (same styles, different default colors)
 class AppTypographyDark {
   AppTypographyDark._();
 

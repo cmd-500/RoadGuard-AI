@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/design_system/index.dart';
 import 'icons.dart';
 
-/// Base card with elevation and modern styling
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -78,7 +77,6 @@ class AppCard extends StatelessWidget {
   }
 }
 
-/// Card with gradient background
 class AppGradientCard extends StatelessWidget {
   final Widget child;
   final Gradient gradient;
@@ -135,7 +133,7 @@ class AppGradientCard extends StatelessWidget {
   }
 }
 
-/// Glassmorphism card
+//Glassmorphism card
 class AppGlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -194,7 +192,6 @@ class AppGlassCard extends StatelessWidget {
   }
 }
 
-/// Hazard-specific card for road hazards
 class AppHazardCard extends StatelessWidget {
   final String hazardType;
   final String title;
@@ -329,7 +326,6 @@ class AppHazardCard extends StatelessWidget {
   }
 }
 
-/// Safety alert card
 class AppSafetyAlertCard extends StatelessWidget {
   final String title;
   final String description;
@@ -464,7 +460,6 @@ class AppSafetyAlertCard extends StatelessWidget {
   }
 }
 
-/// Quick action card for home screen - responsive
 class AppQuickActionCard extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -493,7 +488,7 @@ class AppQuickActionCard extends StatelessWidget {
         final iconSize = isCompact ? 40.0 : 48.0;
         final iconInnerSize = isCompact ? 18.0 : 22.0;
         final titleStyle = isCompact ? AppTypography.labelSmall : AppTypography.titleSmall;
-        final subtitleStyle = isCompact 
+        final subtitleStyle = isCompact
             ? AppTypography.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 9)
             : AppTypography.bodySmall.copyWith(color: AppColors.textSecondary);
         final padding = isCompact ? AppSpacing.xs : AppSpacing.sm;
@@ -556,7 +551,6 @@ class AppQuickActionCard extends StatelessWidget {
   }
 }
 
-/// Stat card for profile/dashboard
 class AppStatCard extends StatelessWidget {
   final String label;
   final String value;
@@ -616,7 +610,6 @@ class AppStatCard extends StatelessWidget {
   }
 }
 
-/// Info card with icon and message
 class AppInfoCard extends StatelessWidget {
   final String title;
   final String message;
@@ -681,7 +674,6 @@ class AppInfoCard extends StatelessWidget {
   }
 }
 
-/// Badge card for achievements
 class AppBadgeCard extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -741,7 +733,6 @@ class AppBadgeCard extends StatelessWidget {
   }
 }
 
-/// Menu item card for settings/profile
 class AppMenuCard extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -807,9 +798,6 @@ class AppMenuCard extends StatelessWidget {
   }
 }
 
-/// Compact list-row for a live/nearby alert — icon, title, meta line,
-/// distance and a chevron on the trailing edge, plus a small risk pill.
-/// Used on the Home screen's "Live Alerts" feed.
 class AppAlertListItem extends StatelessWidget {
   final String hazardType;
   final String title;
@@ -867,7 +855,7 @@ class AppAlertListItem extends StatelessWidget {
         return AppIcons.hammer;
       case 'EMERGENCY':
         return AppIcons.warningCircle;
-    // Alert categories (Live Alerts feed)
+
       case 'ROAD':
         return AppIcons.roadHorizon;
       case 'WEATHER':

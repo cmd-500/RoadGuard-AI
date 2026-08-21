@@ -49,10 +49,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
 
   @override
   void didChangeMetrics() {
-    // On Flutter Web, Chrome's DevTools "toggle device toolbar" actually
-    // stops the underlying camera hardware track (not just pauses
-    // playback), so resumePreview() alone can't revive it. Once the
-    // resize settles, fully tear down and re-acquire the camera stream.
+
     if (!kIsWeb) return;
     if (!_isInitialized || _controller == null) return;
 
@@ -108,10 +105,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
       setState(() => _isInitialized = true);
 
       if (kIsWeb) {
-        // Chrome only paints the camera's platform view after a layout
-        // pass triggered by a resize (this is why toggling DevTools
-        // "fixes" it). Fire a synthetic resize so it paints immediately
-        // instead of requiring the user to resize the window manually.
+
         await Future.delayed(const Duration(milliseconds: 100));
         html.window.dispatchEvent(html.Event('resize'));
       }
@@ -401,7 +395,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> with WidgetsB
               child: AppPrimaryButton(
                 label: 'Use Photo',
                 trailingIcon: AppIcons.forward,
-                onPressed: () {}, // Navigation handled by parent
+                onPressed: () {},
               ),
             ),
           ],

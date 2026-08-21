@@ -1,5 +1,5 @@
 class ApiConfig {
-  // Use dart-define for web (localhost), default to Android emulator IP
+
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'http://10.0.2.2:8080/api/v1',
@@ -42,7 +42,7 @@ class UserRole {
 }
 
 class GeoDefaults {
-  // fallback camera center if location permission not yet granted
+
   static const double defaultLat = 28.6139;
   static const double defaultLng = 77.2090;
   static const int nearbyAlertRadiusMeters = 300;

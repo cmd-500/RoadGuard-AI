@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/design_system/index.dart';
 import 'icons.dart';
 
-/// Circular progress indicator with modern styling
 class AppCircularProgress extends StatelessWidget {
   final double? value;
   final double size;
@@ -44,7 +43,6 @@ class AppCircularProgress extends StatelessWidget {
   }
 }
 
-/// Linear progress indicator
 class AppLinearProgress extends StatelessWidget {
   final double? value;
   final double height;
@@ -85,7 +83,6 @@ class AppLinearProgress extends StatelessWidget {
   }
 }
 
-/// Step progress indicator (for multi-step flows)
 class AppStepProgress extends StatelessWidget {
   final int currentStep;
   final int totalSteps;
@@ -186,7 +183,6 @@ class AppStepProgress extends StatelessWidget {
   }
 }
 
-/// Combined progress indicator (steps + labels) - used in report screen
 class AppCombinedProgress extends StatelessWidget {
   final List<String> steps;
   final int currentStep;
@@ -277,7 +273,6 @@ class AppCombinedProgress extends StatelessWidget {
   }
 }
 
-/// Skeleton loader for content placeholders
 class AppSkeleton extends StatelessWidget {
   final double? width;
   final double? height;
@@ -314,7 +309,6 @@ class AppSkeleton extends StatelessWidget {
   }
 }
 
-/// Skeleton loader for list items
 class AppSkeletonList extends StatelessWidget {
   final int itemCount;
   final double itemHeight;
@@ -345,7 +339,6 @@ class AppSkeletonList extends StatelessWidget {
   }
 }
 
-/// Skeleton loader for card grid
 class AppSkeletonGrid extends StatelessWidget {
   final int itemCount;
   final double aspectRatio;
@@ -382,7 +375,6 @@ class AppSkeletonGrid extends StatelessWidget {
   }
 }
 
-/// Shimmer effect widget
 class Shimmer extends StatefulWidget {
   final Widget child;
   final Color baseColor;
@@ -453,7 +445,6 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
   }
 }
 
-/// Pull to refresh indicator
 class AppRefreshIndicator extends StatelessWidget {
   final Widget child;
   final Future<void> Function() onRefresh;
@@ -484,7 +475,6 @@ class AppRefreshIndicator extends StatelessWidget {
   }
 }
 
-/// Loading overlay for full-screen loading
 class AppLoadingOverlay extends StatelessWidget {
   final bool isLoading;
   final Widget child;
@@ -530,7 +520,6 @@ class AppLoadingOverlay extends StatelessWidget {
   }
 }
 
-/// Button loading state
 class AppButtonLoading extends StatelessWidget {
   final bool isLoading;
   final Widget child;

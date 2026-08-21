@@ -477,9 +477,7 @@ class AppTheme {
           bodyColor: AppColorsDark.textPrimary,
           displayColor: AppColorsDark.textPrimary,
         ),
-        // Without this, dark mode fell back to Flutter's default
-        // InputDecorationTheme, which doesn't match AppColorsDark and was
-        // part of why typed text could become unreadable in dark mode.
+
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: AppColorsDark.surfaceContainerLow,

@@ -16,9 +16,6 @@ class LocationService {
     return Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   }
 
-  // live updates while driver mode is on screen; app-foreground only for now,
-  // true background tracking needs a platform foreground-service setup we're
-  // not building for the hackathon demo
   static Stream<Position> positionStream({int distanceFilterMeters = 15}) {
     return Geolocator.getPositionStream(
       locationSettings: LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: distanceFilterMeters),

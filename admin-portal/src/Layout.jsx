@@ -7,6 +7,7 @@ export function Layout({
   onLogin,
   onLogout,
   data,
+  records,
   onResolve,
   onSelectAlert,
   getIconConfig,
@@ -203,7 +204,7 @@ export function Layout({
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                 <div className="lg:col-span-3 bg-white h-[38rem] rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                   <MapWidget
-                    data={data}
+                    data={records}
                     setSel={(item) =>
                       onSelectAlert({
                         ...item,
@@ -219,23 +220,23 @@ export function Layout({
                     <div className="flex justify-between items-center mb-4 sticky top-0 bg-white pb-2 border-b border-slate-100 z-10">
                       <div>
                         <h3 className="font-semibold text-slate-800">
-                          Live Alerts
+                          Verified Records
                         </h3>
 
                         <p className="text-xs text-slate-400 mt-1">
-                          Current road issues
+                          Confirmed road issues
                         </p>
                       </div>
 
-                      <span className="text-xs font-semibold bg-red-50 text-red-600 px-2 py-1 rounded-full">
-                        {data?.length || 0} Active
+                      <span className="text-xs font-semibold bg-green-50 text-green-600 px-2 py-1 rounded-full">
+                        {records?.length || 0} Verified
                       </span>
                     </div>
 
                     <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                       <ul className="flex flex-col gap-4">
-                        {data?.length > 0 ? (
-                          data.map((item) => {
+                        {records?.length > 0 ? (
+                          records.map((item) => {
                             const iconData =
                               getIconConfig(item.type);
 
@@ -307,26 +308,13 @@ export function Layout({
                                     </p>
                                   </div>
 
-                                  <div className="mt-3 pt-3 border-t border-slate-100">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setResolveConfirmId(
-                                          item.id
-                                        );
-                                      }}
-                                      className="w-full bg-[#22c55e] hover:bg-green-600 text-white px-4 py-2.5 rounded-lg text-xs font-semibold shadow-sm transition-colors"
-                                    >
-                                      Mark as Resolved
-                                    </button>
-                                  </div>
                                 </div>
                               </li>
                             );
                           })
                         ) : (
                           <li className="text-center py-10 text-slate-400 text-sm">
-                            No live alerts found.
+                            No verified records found.
                           </li>
                         )}
                       </ul>

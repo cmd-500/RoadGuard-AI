@@ -35,11 +35,7 @@ function typeToBackend(type) {
 }
 
 function sevFromBackend(sev) {
-  // The admin dashboard only has 3 severity buckets (low/med/high). Any
-  // CRITICAL report (e.g. older data, or a future source that still sends
-  // it) is folded into "high" rather than silently defaulting to "low" -
-  // burying a critical report as low-severity would be worse than
-  // over-flagging it as high.
+
   const map = { CRITICAL: "high", HIGH: "high", MEDIUM: "med", LOW: "low" };
   return map[sev] || "low";
 }
@@ -69,7 +65,7 @@ function getIconConfig(type) {
       text: "text-red-600",
       border: "border-red-200",
       svg: (
-          // Pothole: circular crater with cracked rim
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <ellipse cx="12" cy="13" rx="7" ry="4.5" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10.5l1.5 2M15 10l-1.2 2.3M11 15.5l1-2" />
@@ -82,7 +78,7 @@ function getIconConfig(type) {
       text: "text-amber-600",
       border: "border-amber-200",
       svg: (
-          // Accident: car with impact burst
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16v-2.5L5 9h9l3 4.5V16M3 16h14M3 16v2M17 16v2" />
             <circle cx="6.5" cy="16.5" r="1.5" strokeWidth={2} />
@@ -96,7 +92,7 @@ function getIconConfig(type) {
       text: "text-blue-600",
       border: "border-blue-200",
       svg: (
-          // Waterlogging: stacked waves
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 14c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0" />
@@ -109,7 +105,7 @@ function getIconConfig(type) {
       text: "text-purple-600",
       border: "border-purple-200",
       svg: (
-          // Speed breaker: raised hump on road
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 17c2-4 5-6 10-6s8 2 10 6" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} strokeDasharray="2 2" d="M4 20h16" />
@@ -121,7 +117,7 @@ function getIconConfig(type) {
       text: "text-slate-600",
       border: "border-slate-200",
       svg: (
-          // Fog: horizontal haze lines with sun peeking
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <circle cx="12" cy="7" r="2.5" strokeWidth={2} />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h18M4 16h16M6 20h12" />
@@ -133,7 +129,7 @@ function getIconConfig(type) {
       text: "text-orange-600",
       border: "border-orange-200",
       svg: (
-          // Construction/landslide: mountain with falling debris
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 19l5-9 3.5 5L15 9l6 10H3z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 4l1 1.5M20 5l-1 1.5" />
@@ -145,7 +141,7 @@ function getIconConfig(type) {
       text: "text-indigo-600",
       border: "border-indigo-200",
       svg: (
-          // Emergency/cyclone: spiral
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3a9 9 0 109 9M12 3a5 5 0 105 5M12 3a1.5 1.5 0 101.5 1.5" />
           </svg>
@@ -156,7 +152,7 @@ function getIconConfig(type) {
       text: "text-teal-600",
       border: "border-teal-200",
       svg: (
-          // Other: generic warning triangle
+
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4l9 16H3l9-16z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v4" />
@@ -177,6 +173,50 @@ export default function App() {
   const [mapCenter, setMapCenter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [records, setRecords] = useState([]);
+
+  const fetchRecords = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append("status", "RESOLVED");
+
+      const res = await fetch(`${API_BASE}/reports?${params.toString()}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch records");
+
+      const json = await res.json();
+      const reports = json.content || json.data || json.reports || (Array.isArray(json) ? json : []);
+
+      const mapped = reports.map((r) => {
+        const { date, time } = formatDate(r.createdAt);
+        return {
+          id: r.id,
+          type: typeFromBackend(r.hazardType),
+          sev: sevFromBackend(r.severity),
+          lat: r.latitude,
+          lng: r.longitude,
+          time: time,
+          date: date,
+          loc: r.address,
+          statusMsg: "Verified",
+          img: r.imageUrl,
+          aiConf: "95%",
+          aiStatus: "Verified",
+          communityStatus: r.communityStatus,
+          reportStatus: r.status,
+          voteScore: r.voteScore,
+          creator: r.createdBy,
+          distanceMeters: r.distanceMeters,
+        };
+      });
+
+      setRecords(mapped);
+    } catch (e) {
+      console.error("Failed to load records:", e);
+    }
+  }, []);
 
   const fetchReports = useCallback(async () => {
     try {
@@ -191,7 +231,7 @@ export default function App() {
       if (!res.ok) throw new Error("Failed to fetch reports");
 
       const json = await res.json();
-      // Backend returns a Spring Page object -> the array lives under "content"
+
       const reports = json.content || json.data || json.reports || (Array.isArray(json) ? json : []);
 
       const mapped = reports
@@ -230,24 +270,42 @@ export default function App() {
 
   useEffect(() => {
     fetchReports();
-    const interval = setInterval(fetchReports, 30000);
+    fetchRecords();
+    const interval = setInterval(() => {
+      fetchReports();
+      fetchRecords();
+    }, 30000);
     return () => clearInterval(interval);
-  }, [fetchReports]);
+  }, [fetchReports, fetchRecords]);
 
   const tot = data.length;
   const high = data.filter(d => d.sev === "high").length;
 
-  const handleFix = async (id) => {
+  const handleFix = async (id, actionType = "resolve") => {
+    const statusMap = {
+      verify: "RESOLVED",
+      dismiss: "REJECTED",
+      resolve: "RESOLVED",
+    };
+    const status = statusMap[actionType] || "RESOLVED";
+
     try {
-      await fetch(`${API_BASE}/reports/${id}/status`, {
+      const res = await fetch(`${API_BASE}/reports/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "RESOLVED" }),
+        body: JSON.stringify({ status }),
       });
+      if (!res.ok) throw new Error(`Status update failed (${res.status})`);
+
+      // Report is no longer pending/in-progress, so it always leaves the
+      // Live Alerts list. If it was verified/resolved, it now belongs in Records.
       setData((prev) => prev.filter((item) => item.id !== id));
+      if (status === "RESOLVED") {
+        fetchRecords();
+      }
       setSel(null);
     } catch (e) {
-      console.error("Failed to resolve:", e);
+      console.error("Failed to update report status:", e);
     }
   };
 
@@ -269,6 +327,7 @@ export default function App() {
               setAuth(false);
             }}
             data={data}
+            records={records}
             onResolve={handleFix}
             onSelectAlert={setSel}
             getIconConfig={getIconConfig}

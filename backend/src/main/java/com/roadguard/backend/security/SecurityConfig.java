@@ -42,6 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/reports/nearby").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/reports").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/reports").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/reports/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/reports/*/status").permitAll()
                         .requestMatchers("/reports/check-route").permitAll()
                         .requestMatchers("/health", "/actuator/**").permitAll()
                         .anyRequest().authenticated()

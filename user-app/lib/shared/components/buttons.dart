@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/design_system/index.dart';
 import 'icons.dart';
 
-/// Primary button - main action
 class AppPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -87,7 +86,6 @@ class AppPrimaryButton extends StatelessWidget {
   }
 }
 
-/// Secondary button - alternative action
 class AppSecondaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -176,7 +174,6 @@ class AppSecondaryButton extends StatelessWidget {
   }
 }
 
-/// Tertiary button - subtle action
 class AppTertiaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -260,7 +257,6 @@ class AppTertiaryButton extends StatelessWidget {
   }
 }
 
-/// Danger button - destructive action
 class AppDangerButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -336,7 +332,6 @@ class AppDangerButton extends StatelessWidget {
   }
 }
 
-/// Icon button with modern styling
 class AppIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onPressed;
@@ -392,7 +387,6 @@ class AppIconButton extends StatelessWidget {
   }
 }
 
-/// Floating Action Button
 class AppFAB extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onPressed;
@@ -455,7 +449,7 @@ class AppFAB extends StatelessWidget {
   }
 }
 
-/// Segmented control
+//Segmented control
 class AppSegmentedButton<T> extends StatelessWidget {
   final List<AppSegment<T>> segments;
   final T? selectedValue;
@@ -516,7 +510,6 @@ class AppSegment<T> {
   const AppSegment({required this.value, required this.label, this.icon, this.tooltip});
 }
 
-/// Toggle button (switch-like)
 class AppToggleButton extends StatelessWidget {
   final String label;
   final bool value;

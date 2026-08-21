@@ -46,7 +46,7 @@ public class VoteService {
                 throw ApiException.badRequest("ALREADY_VOTED", "You already cast this vote");
             }
 
-            // Switching vote
+            //Switching vote
             report.setVoteScore(report.getVoteScore() - existingVote.getSignedWeight());
             if (existingVote.getVoteType() == Vote.VoteType.UPVOTE) {
                 report.setUpvoteCount(report.getUpvoteCount() - 1);

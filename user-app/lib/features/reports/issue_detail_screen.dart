@@ -460,7 +460,7 @@ class IssueDetailScreen extends StatelessWidget {
   }
 
   void _shareIssue() {
-    // Implement share functionality
+
   }
 
   Future<void> _openInMaps(double lat, double lng) async {

@@ -12,13 +12,13 @@ const pinIcon = new L.DivIcon({
 
 function MapUpdater({ center }) {
   const map = useMap();
-  
+
   useEffect(() => {
     if (center) {
       map.flyTo(center, 15, { duration: 1.5 });
     }
-  }, [center, map]); 
-  
+  }, [center, map]);
+
   return null;
 }
 
@@ -34,7 +34,7 @@ export function MapWidget({ data, setSel, center }) {
             zoomControl={false}
         >
           <MapUpdater center={center} />
-          
+
           <TileLayer
               url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

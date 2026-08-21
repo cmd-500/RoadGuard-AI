@@ -1,4 +1,4 @@
-// This is a basic Flutter widget test.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +19,6 @@ void main() {
     final reportRepo = ReportRepositoryImpl(apiClient: apiClient);
     final voteRepo = VoteRepositoryImpl(apiClient: apiClient);
 
-    // Build our app and trigger a frame.
     await tester.pumpWidget(
       MultiProvider(
         providers: [
@@ -44,10 +43,8 @@ void main() {
       ),
     );
 
-    // Wait for initialization
     await tester.pumpAndSettle();
 
-    // Verify home screen loads - check for greeting text
     expect(find.textContaining('Good'), findsOneWidget);
     expect(find.text('Let\'s make your journey safe today.'), findsOneWidget);
   });
@@ -84,12 +81,11 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Check all 5 navigation tabs exist
     expect(find.text('Home'), findsOneWidget);
     expect(find.text('Map'), findsOneWidget);
     expect(find.text('Alerts'), findsOneWidget);
     expect(find.text('Profile'), findsOneWidget);
-    // Report is the center FAB
+
     expect(find.byIcon(Icons.add), findsOneWidget);
   });
 }

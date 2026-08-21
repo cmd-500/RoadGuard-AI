@@ -3,7 +3,6 @@ import '../../core/design_system/index.dart';
 import 'icons.dart';
 import 'badges.dart';
 
-/// Hazard icon with semantic colors and sizes
 class AppHazardIcon extends StatelessWidget {
   final String hazardType;
   final AppHazardIconSize size;
@@ -98,7 +97,6 @@ class AppHazardIcon extends StatelessWidget {
 
 enum AppHazardIconSize { small, medium, large, xlarge }
 
-/// Severity indicator dot
 class AppSeverityIndicator extends StatelessWidget {
   final String severity;
   final double size;
@@ -143,7 +141,6 @@ class AppSeverityIndicator extends StatelessWidget {
   }
 }
 
-/// Status indicator with pulse animation for live status
 class AppStatusIndicator extends StatefulWidget {
   final AppStatus status;
   final double size;
@@ -214,7 +211,6 @@ class _AppStatusIndicatorState extends State<AppStatusIndicator> with SingleTick
   }
 }
 
-/// Hazard type selector chip
 class AppHazardChip extends StatelessWidget {
   final String hazardType;
   final bool selected;
@@ -303,7 +299,6 @@ class AppHazardChip extends StatelessWidget {
   }
 }
 
-/// Map marker for hazards
 class AppHazardMarker extends StatelessWidget {
   final String hazardType;
   final double size;
@@ -388,7 +383,6 @@ class AppHazardMarker extends StatelessWidget {
   }
 }
 
-/// Current location marker
 class AppCurrentLocationMarker extends StatelessWidget {
   final double size;
   final bool pulsing;

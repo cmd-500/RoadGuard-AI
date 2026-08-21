@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Brand - Deep Teal/Emerald (trust, safety, road)
   static const Color primary = Color(0xFF00875F);
   static const Color primaryLight = Color(0xFF34D399);
   static const Color primaryDark = Color(0xFF005A3D);
@@ -12,45 +11,38 @@ class AppColors {
   static const Color onPrimary = Color(0xFFFFFFFF);
   static const Color onPrimaryContainer = Color(0xFF002010);
 
-  // Secondary - Deep Navy (authority, night driving)
   static const Color secondary = Color(0xFF0F172A);
   static const Color secondaryLight = Color(0xFF3B82F6);
   static const Color secondaryContainer = Color(0xFFDBEAFE);
   static const Color onSecondary = Color(0xFFFFFFFF);
   static const Color onSecondaryContainer = Color(0xFF1E3A5F);
 
-  // Tertiary - Warm Amber (caution, attention)
   static const Color tertiary = Color(0xFFF59E0B);
   static const Color tertiaryLight = Color(0xFFFBBF24);
   static const Color tertiaryContainer = Color(0xFFFEF3C7);
   static const Color onTertiary = Color(0xFF000000);
   static const Color onTertiaryContainer = Color(0xFF78350F);
 
-  // Semantic - Success
   static const Color success = Color(0xFF059669);
   static const Color successLight = Color(0xFFD1FAE5);
   static const Color successDark = Color(0xFF064E3B);
   static const Color onSuccess = Color(0xFFFFFFFF);
 
-  // Semantic - Warning
   static const Color warning = Color(0xFFD97706);
   static const Color warningLight = Color(0xFFFEF3C7);
   static const Color warningDark = Color(0xFF78350F);
   static const Color onWarning = Color(0xFF000000);
 
-  // Semantic - Error
   static const Color error = Color(0xFFDC2626);
   static const Color errorLight = Color(0xFFFEE2E2);
   static const Color errorDark = Color(0xFF991B1B);
   static const Color onError = Color(0xFFFFFFFF);
 
-  // Semantic - Info
   static const Color info = Color(0xFF2563EB);
   static const Color infoLight = Color(0xFFDBEAFE);
   static const Color infoDark = Color(0xFF1E3A5F);
   static const Color onInfo = Color(0xFFFFFFFF);
 
-  // Surface - Light Theme (clean, layered)
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceDim = Color(0xFFF8FAFC);
   static const Color surfaceBright = Color(0xFFFFFFFF);
@@ -61,25 +53,22 @@ class AppColors {
   static const Color surfaceContainerHighest = Color(0xFF94A3B8);
   static const Color inverseSurface = Color(0xFF0F172A);
 
-  // Background
+  //Background
   static const Color background = Color(0xFFFAFAFA);
   static const Color backgroundAlt = Color(0xFFF0F4F8);
   static const Color onBackground = Color(0xFF0F172A);
 
-  // Text - Light Theme
   static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF475569);
   static const Color textTertiary = Color(0xFF94A3B8);
   static const Color textDisabled = Color(0xFFCBD5E1);
   static const Color textInverse = Color(0xFFFFFFFF);
 
-  // Outline & Divider
   static const Color outline = Color(0xFFE2E8F0);
   static const Color outlineStrong = Color(0xFFCBD5E1);
   static const Color outlineVariant = Color(0xFFF1F5F9);
   static const Color divider = Color(0xFFE2E8F0);
 
-  // Shadow & Overlay
   static const Color shadow = Color(0x1A000000);
   static const Color shadowMedium = Color(0x26000000);
   static const Color shadowStrong = Color(0x33000000);
@@ -87,7 +76,6 @@ class AppColors {
   static const Color overlayStrong = Color(0xCC000000);
   static const Color scrim = Color(0x80000000);
 
-  // Gradients - Brand
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [primary, primaryDark],
     begin: Alignment.topLeft,
@@ -106,7 +94,6 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
-  // Gradients - Surface
   static const LinearGradient surfaceGradient = LinearGradient(
     colors: [surface, surfaceDim],
     begin: Alignment.topCenter,
@@ -119,7 +106,6 @@ class AppColors {
     end: Alignment.bottomCenter,
   );
 
-  // Gradients - Glassmorphism
   static const LinearGradient glassLight = LinearGradient(
     colors: [Color(0x80FFFFFF), Color(0x40FFFFFF)],
     begin: Alignment.topLeft,
@@ -132,7 +118,6 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
-  // Gradients - Status
   static const LinearGradient successGradient = LinearGradient(
     colors: [success, successDark],
     begin: Alignment.topLeft,
@@ -151,7 +136,6 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
-  // Hazard Colors (semantic, accessible)
   static const Map<String, Color> hazardColors = {
     'POTHOLE': Color(0xFFEA580C),
     'ACCIDENT': Color(0xFFDC2626),
@@ -165,7 +149,7 @@ class AppColors {
     'CONSTRUCTION': Color(0xFF7C3AED),
     'EMERGENCY': Color(0xFFDC2626),
     'OTHER': Color(0xFF64748B),
-    // Alert categories (Live Alerts feed, grouped rather than per hazard type)
+
     'ROAD': Color(0xFFEA580C),
     'WEATHER': Color(0xFF0891B2),
     'VISIBILITY': Color(0xFF2563EB),
@@ -191,7 +175,7 @@ class AppColors {
     'DISASTER': Color(0xFFEDE9FE),
   };
 
-  // Severity Colors
+  //Severity Colors
   static const Map<String, Color> severityColors = {
     'CRITICAL': Color(0xFFDC2626),
     'HIGH': Color(0xFFEA580C),
@@ -226,7 +210,7 @@ class AppColors {
     return severityLightColors[severity.toUpperCase()] ?? infoLight;
   }
 
-  // Status Colors
+  //Status Colors
   static const Map<String, Color> statusColors = {
     'OPEN': info,
     'IN_PROGRESS': warning,
@@ -254,11 +238,10 @@ class AppColors {
   }
 }
 
-// Dark Theme Colors
 class AppColorsDark {
   AppColorsDark._();
 
-  // Brand
+  //Brand
   static const Color primary = Color(0xFF34D399);
   static const Color primaryLight = Color(0xFF6EE7B7);
   static const Color primaryDark = Color(0xFF10B981);
@@ -267,21 +250,21 @@ class AppColorsDark {
   static const Color onPrimary = Color(0xFF002010);
   static const Color onPrimaryContainer = Color(0xFFD1FAE5);
 
-  // Secondary
+  //Secondary
   static const Color secondary = Color(0xFF60A5FA);
   static const Color secondaryLight = Color(0xFF93C5FD);
   static const Color secondaryContainer = Color(0xFF1E3A5F);
   static const Color onSecondary = Color(0xFF1E3A5F);
   static const Color onSecondaryContainer = Color(0xFFDBEAFE);
 
-  // Tertiary
+  //Tertiary
   static const Color tertiary = Color(0xFFFBBF24);
   static const Color tertiaryLight = Color(0xFFFDE047);
   static const Color tertiaryContainer = Color(0xFF78350F);
   static const Color onTertiary = Color(0xFF422006);
   static const Color onTertiaryContainer = Color(0xFFFEF3C7);
 
-  // Semantic
+  //Semantic
   static const Color success = Color(0xFF34D399);
   static const Color successLight = Color(0xFF064E3B);
   static const Color warning = Color(0xFFFBBF24);
@@ -292,7 +275,6 @@ class AppColorsDark {
   static const Color info = Color(0xFF60A5FA);
   static const Color infoLight = Color(0xFF1E3A5F);
 
-  // Surface - Dark Theme
   static const Color surface = Color(0xFF1E293B);
   static const Color surfaceDim = Color(0xFF0F172A);
   static const Color surfaceBright = Color(0xFF334155);
@@ -303,25 +285,22 @@ class AppColorsDark {
   static const Color surfaceContainerHighest = Color(0xFF64748B);
   static const Color inverseSurface = Color(0xFFFAFAFA);
 
-  // Background
+  //Background
   static const Color background = Color(0xFF020617);
   static const Color backgroundAlt = Color(0xFF0F172A);
   static const Color onBackground = Color(0xFFF8FAFC);
 
-  // Text - Dark Theme
   static const Color textPrimary = Color(0xFFF8FAFC);
   static const Color textSecondary = Color(0xFFCBD5E1);
   static const Color textTertiary = Color(0xFF94A3B8);
   static const Color textDisabled = Color(0xFF475569);
   static const Color textInverse = Color(0xFF0F172A);
 
-  // Outline & Divider
   static const Color outline = Color(0xFF334155);
   static const Color outlineStrong = Color(0xFF475569);
   static const Color outlineVariant = Color(0xFF1E293B);
   static const Color divider = Color(0xFF334155);
 
-  // Shadow & Overlay
   static const Color shadow = Color(0x33000000);
   static const Color shadowMedium = Color(0x40000000);
   static const Color shadowStrong = Color(0x50000000);
@@ -329,7 +308,7 @@ class AppColorsDark {
   static const Color overlayStrong = Color(0xCC000000);
   static const Color scrim = Color(0x80000000);
 
-  // Gradients
+  //Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [primary, primaryDark],
     begin: Alignment.topLeft,
